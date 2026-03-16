@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GVL Dining">
+<title>Greenville Dining Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1a2e40;
+  --gold: #c9a94e;
+  --cream: #faf8f0;
+  --dark-cream: #f0ede0;
+  --border: #d6d1c0;
+  --dark: #2a2a1a;
+  --med: #4a4a3a;
+  --light: #6b6b5c;
+  --muted: #8a8a7a;
+  --white: #ffffff;
+  --michelin: #c1272d;
+  --wine: #5c3d2e;
+  --green-good: #2d6a4f;
+  --green-ok: #6b8f3d;
+  --amber: #b5850b;
+  --red-low: #a44a3f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Crimson Pro', Georgia, serif;
+  background: #f5f2e6;
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER */
+.header {
+  background: var(--navy);
+  padding: 28px 20px 24px;
+  text-align: center;
+  border-bottom: 4px solid var(--gold);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.header h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--cream);
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.header-stats {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #8a9baf;
+}
+
+/* SEARCH + FILTERS */
+.controls {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 14px 14px 0;
+}
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 16px; /* prevents iOS zoom */
+  background: var(--cream);
+  color: var(--dark);
+  outline: none;
+  margin-bottom: 10px;
+}
+.search-input:focus { border-color: var(--gold); }
+.search-input::placeholder { color: var(--muted); }
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--light);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.filter-btn.active {
+  background: var(--navy);
+  color: var(--gold);
+  border-color: var(--navy);
+}
+
+/* CARDS */
+.cards {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.card.expanded {
+  box-shadow: 0 4px 24px rgba(26,46,64,0.12);
+}
+
+/* Card header (always visible) */
+.card-head {
+  padding: 16px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+.card.expanded .card-head {
+  border-bottom: 1px solid var(--border);
+}
+.card-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.2;
+}
+.card-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--white);
+  border-radius: 3px;
+}
+.badge-michelin { background: var(--michelin); }
+.badge-wine { background: var(--wine); }
+
+.card-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--light);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.staff-count {
+  background: var(--navy);
+  color: var(--gold);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.chevron {
+  font-size: 20px;
+  color: var(--muted);
+  transition: transform 0.2s;
+  line-height: 1;
+}
+.card.expanded .chevron { transform: rotate(180deg); }
+
+/* Card body */
+.card-body {
+  display: none;
+  padding: 16px 18px;
+}
+.card.expanded .card-body { display: block; }
+
+/* Sections */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* Rating rows */
+.ratings-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 480px) {
+  .ratings-details { grid-template-columns: 1fr; }
+}
+.info-panel {
+  background: var(--dark-cream);
+  padding: 12px;
+  border-radius: 4px;
+}
+.rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.rating-row:last-child { margin-bottom: 0; }
+.rating-label {
+  font-size: 13px;
+  color: var(--med);
+}
+.rating-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rating-bar-bg {
+  width: 44px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rating-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.rating-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 26px;
+  text-align: right;
+}
+.rating-none {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Detail lines */
+.detail-line {
+  font-size: 14px;
+  color: var(--med);
+  margin-bottom: 4px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.detail-line a {
+  color: var(--navy);
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 2px;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+/* Vibe & must-try */
+.vibe-text {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--dark);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+.must-try-text {
+  font-size: 15px;
+  color: var(--dark);
+  line-height: 1.55;
+}
+
+/* Staff pills */
+.staff-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.staff-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--navy);
+  color: var(--cream);
+  border-radius: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  cursor: default;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.staff-pill.has-note {
+  cursor: pointer;
+  padding-right: 14px;
+}
+.staff-pill.has-note::after {
+  content: ' \u25BE';
+  color: var(--gold);
+  font-size: 10px;
+  margin-left: 3px;
+  transition: transform 0.15s;
+  display: inline-block;
+}
+.staff-pill.has-note.open::after {
+  transform: rotate(180deg);
+}
+.staff-pill.has-note.open,
+.staff-pill.has-note:active {
+  background: #243d55;
+}
+.staff-note {
+  display: none;
+  color: var(--gold);
+  font-size: 11px;
+  margin-left: 5px;
+}
+.staff-pill.open .staff-note {
+  display: inline;
+}
+
+/* Action buttons */
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.action-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.action-btn:active { opacity: 0.8; }
+.btn-website { background: var(--navy); color: var(--gold); }
+.btn-reserve { background: var(--gold); color: var(--navy); }
+.btn-yelp { background: #d32323; color: var(--white); }
+.btn-call { background: var(--dark-cream); color: var(--navy); border: 1px solid var(--border); }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 24px 16px 36px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* No results */
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 16px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeIn 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Personal Dining Guide</div>
+  <h1>Greenville Dining</h1>
+  <div class="header-stats" id="stats"></div>
+</div>
+
+<div class="controls">
+  <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff...">
+  <div class="filters" id="filters"></div>
+</div>
+
+<div class="cards" id="cards"></div>
+
+<div class="footer">Last updated March 2026 &middot; Greenville, SC</div>
+
+<script>
+const R = [
+  {
+    name: "City Tavern", cuisine: "American Bar & Grill", address: "128 N Main St",
+    phone: "8644489928", phoneDisplay: "(864) 448-9928",
+    website: null, yelp: "https://www.yelp.com/biz/city-tavern-greenville",
+    reservation: null, reservationNote: "Walk-in only",
+    google: 4.4, yelpR: 3.5, tripadvisor: 4.0, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u2013Late",
+    vibe: "Lively downtown bar with frozen drinks, live music, and a recently renovated space",
+    mustTry: "Frozen slushies, Cajun Philly cheesesteak, stuffed mushrooms",
+    staff: [["Lindsey",null],["Emily",null],["Sam",null]]
+  },
+  {
+    name: "Blues Bar", cuisine: "Bar", address: "Downtown Greenville",
+    phone: null, phoneDisplay: null,
+    website: null, yelp: null,
+    reservation: null, reservationNote: "Walk-in",
+    google: null, yelpR: null, tripadvisor: null, price: "$",
+    michelin: false, wine: false, hours: "Evenings",
+    vibe: "Live blues music and drinks", mustTry: null,
+    staff: [["Todd",null],["Gerald",null]]
+  },
+  {
+    name: "Tahini Middle Eastern Eatery", cuisine: "Middle Eastern", address: "11 College St",
+    phone: null, phoneDisplay: null,
+    website: null, yelp: "https://www.yelp.com/biz/tahini-middle-eastern-eatery-greenville",
+    reservation: null, reservationNote: "Fast-casual, walk-in",
+    google: 4.7, yelpR: 4.5, tripadvisor: null, price: "$",
+    michelin: false, wine: false, hours: "11am\u20138pm",
+    vibe: "Authentic Syrian-owned fast-casual spot just off Main Street with bold flavors",
+    mustTry: "Traditional chicken shawarma sandwich, falafel (gluten-free), za\u2019atar fries",
+    staff: [["Habib","co-owner"],["Michael","co-owner, Jarrouge"]]
+  },
+  {
+    name: "Curean", cuisine: "Mediterranean", address: "732A S Main St",
+    phone: "8644164610", phoneDisplay: "(864) 416-4610",
+    website: "https://cureangvl.com", yelp: "https://www.yelp.com/biz/curean-greenville",
+    reservation: "https://resy.com/cities/greenville-sc/venues/curean", reservationNote: "Resy",
+    google: 4.5, yelpR: 4.0, tripadvisor: 3.7, price: "$$",
+    michelin: false, wine: false, hours: "Wed\u2013Mon 5\u201310pm, Brunch Sat\u2013Sun",
+    vibe: "Cozy West End spot with build-your-own charcuterie and Mediterranean small plates",
+    mustTry: "Build-your-own charcuterie, Shrimp Santorini, Greek salad",
+    staff: [["Vicki","owner"],["Joe","dad"]]
+  },
+  {
+    name: "Soby\u2019s New South Cuisine", cuisine: "New South / Contemporary Southern", address: "207 S Main St",
+    phone: "8642327007", phoneDisplay: "(864) 232-7007",
+    website: "https://sobys.com", yelp: "https://www.yelp.com/biz/sobys-greenville",
+    reservation: "https://www.opentable.com/sobys", reservationNote: "OpenTable",
+    google: 4.5, yelpR: 4.0, tripadvisor: 4.4, price: "$$$",
+    michelin: true, wine: true, hours: "Dinner Mon\u2013Sun, Brunch Sat\u2013Sun",
+    vibe: "Iconic Greenville fine dining in a renovated cotton mill, landmark since 1997. Table 301 flagship.",
+    mustTry: "Fried green tomatoes, crab cakes, shrimp & grits, banana cream pie",
+    staff: [["Ashley","former Foxcroft"],["Maison","yinzer"],["Rachel",null]]
+  },
+  {
+    name: "Northampton Wine + Dine", cuisine: "New American / Wine Bar", address: "211-A E Broad St",
+    phone: "8642713919", phoneDisplay: "(864) 271-3919",
+    website: "https://northamptonwineanddine.com", yelp: "https://www.yelp.com/biz/northampton-wine-dine-greenville-2",
+    reservation: "https://resy.com/cities/greenville-sc/venues/northampton-wine-and-dine", reservationNote: "Resy / Call",
+    google: 4.6, yelpR: 4.5, tripadvisor: 4.6, price: "$$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 10am\u20139pm",
+    vibe: "1,500+ wine selections at retail + $10 corkage. Fine dining in a restored 1891 power station.",
+    mustTry: "Filet mignon, Scottish salmon, pan-seared scallops",
+    staff: [["Richard","owner"],["Shane",null],["Jamie",null],["David","silver hair"],["Capers",null]]
+  },
+  {
+    name: "Topsoil Kitchen & Market", cuisine: "Farm-to-Table", address: "13 S Main St, Travelers Rest",
+    phone: "8644005424", phoneDisplay: "(864) 400-5424",
+    website: "https://www.topsoilrestaurant.com", yelp: "https://www.yelp.com/biz/topsoil-kitchen-and-market-travelers-rest-2",
+    reservation: "https://www.opentable.com/r/topsoil-kitchen-and-market-travelers-rest", reservationNote: "OpenTable",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.4, price: "$$$",
+    michelin: true, wine: false, hours: "Thu\u2013Sat Dinner, Sat\u2013Sun Brunch, Sun Tasting",
+    vibe: "James Beard semi-finalist Chef Adam Cooke. Own 16-acre farm. Prix fixe & tasting menus. Jazz Thursdays.",
+    mustTry: "Prix fixe seasonal dinner, Sunday Chef\u2019s Tasting, chicken liver mousse",
+    staff: [["Sean",null],["Eric","Craig\u2019s son"]]
+  },
+  {
+    name: "Rick Erwin\u2019s West End Grille", cuisine: "Steakhouse / Fine Dining", address: "648 S Main St",
+    phone: "8643090335", phoneDisplay: "(864) 309-0335",
+    website: "https://www.rickerwins.com/west-end-grille/", yelp: "https://www.yelp.com/biz/rick-erwins-west-end-grill-greenville-2",
+    reservation: "https://www.opentable.com/r/rick-erwins-west-end-grille-greenville", reservationNote: "OpenTable",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.5, price: "$$$$",
+    michelin: false, wine: true, hours: "Mon\u2013Sat 4\u201310/11pm",
+    vibe: "Greenville\u2019s original upscale steakhouse. Linz Heritage Beef, mahogany & jazz ambiance. Complimentary valet.",
+    mustTry: "Crab cakes, prime steaks, she crab soup, key lime pie",
+    staff: [["Kevin",null],["Maria Erwin",null],["Liz","blonde"],["Mike",null],["Ellie",null],["Grace",null]]
+  },
+  {
+    name: "The Jones Oyster Co.", cuisine: "Seafood / Oyster Bar", address: "22 E Court St",
+    phone: "8645490301", phoneDisplay: "(864) 549-0301",
+    website: "https://www.thejonesoysterco.com", yelp: "https://www.yelp.com/biz/the-jones-oyster-greenville",
+    reservation: null, reservationNote: "Walk-in only (45 seats)",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.8, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u20139/10pm",
+    vibe: "New England-style oyster bar by Table 301 in a historic space. Nautical charm, bustling raw bar.",
+    mustTry: "Raw oysters, lobster roll (CT or ME style), hush puppies, smoked fish dip",
+    staff: [["Emma",null],["Mike/Michael",null],["Clem",null],["Veles",null],["Free","shucker"],["Jesse",null],["Trinity",null]]
+  },
+  {
+    name: "Ristorante Bergamo", cuisine: "Northern Italian", address: "100 N Main St",
+    phone: "8642718667", phoneDisplay: "(864) 271-8667",
+    website: "https://www.ristorantebergamogreenville.com", yelp: "https://www.yelp.com/biz/ristorante-bergamo-greenville",
+    reservation: null, reservationNote: "Call to reserve",
+    google: 4.5, yelpR: 4.0, tripadvisor: 4.2, price: "$$$",
+    michelin: false, wine: false, hours: "Tue\u2013Sat 5:30\u20139:30pm",
+    vibe: "Downtown mainstay since 1986. NYC-trained Chef Gian Pietro Ferro brings Lombardy tradition.",
+    mustTry: "House-made pasta, Gamberoni in Brandy Cream, Scallopine con Porcini, daily specials",
+    staff: [["Kathy","co-owner, Ferro"],["Michael",null],["JP",null],["David",null],["Tim",null]]
+  },
+  {
+    name: "New Realm Brewing Co.", cuisine: "Brewery / American", address: "912 S Main St",
+    phone: null, phoneDisplay: null,
+    website: "https://newrealmbrewing.com/greenville/", yelp: "https://www.yelp.com/biz/new-realm-brewing-greenville",
+    reservation: null, reservationNote: "Walk-in, large venue",
+    google: 4.2, yelpR: 3.5, tripadvisor: 3.5, price: "$$",
+    michelin: false, wine: false, hours: "Daily 12\u201310pm, Fri\u2013Sat til midnight",
+    vibe: "Craft brewery in the historic Old Cigar Warehouse at Unity Park. Wood-fired kitchen, outdoor stage, live events.",
+    mustTry: "Wagyu burger, wood-fired pizza, house-brewed IPAs & pilsners",
+    staff: [["Christian",null],["Mary",null],["Carly",null],["Jessica",null],["Adam",null]]
+  },
+  {
+    name: "DeMarco\u2019s Italian", cuisine: "Italian-American", address: "366 Field St, Suite A",
+    phone: "8643991722", phoneDisplay: "(864) 399-1722",
+    website: "https://www.demarcositalian.com", yelp: "https://www.yelp.com/biz/demarcos-italian-greenville-3",
+    reservation: "https://resy.com/cities/greenville-sc/venues/demarcos-italian", reservationNote: "Resy",
+    google: 4.3, yelpR: 3.5, tripadvisor: 2.3, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Thu 4\u20139pm, Fri\u2013Sat 4\u201310pm, Sun 4\u20139pm",
+    vibe: "Family-owned in the West End by Fluor Field. Fresh dough daily, pastas from The Pasta Addict.",
+    mustTry: "New Yorker pizza, hand-tossed pies, tiramisu, cannoli",
+    staff: [["Teresa","curly dark hair"],["Darren",null],["Kyle","tall skinny"],["X","semi crabby behind bar"],["Jay","Urban Wren"],["Lisa","Greek makes the Soby\u2019s"],["Rem","metal detector"],["Fitz","new guy, bald, not Dan handsome"],["Gabriel","new Level 1 Som"]]
+  },
+  {
+    name: "BrickTop\u2019s", cuisine: "American Bistro / Steakhouse", address: "1 N Main St, Ste H",
+    phone: "8647943830", phoneDisplay: "(864) 794-3830",
+    website: "https://bricktops.com/greenville", yelp: "https://www.yelp.com/biz/bricktops-greenville",
+    reservation: "https://bricktops.com/greenville", reservationNote: "Via website / call",
+    google: 4.5, yelpR: 4.0, tripadvisor: 4.3, price: "$$$",
+    michelin: false, wine: false, hours: "Mon\u2013Thu 11am\u20139pm, Fri\u2013Sun extended",
+    vibe: "Upscale American bistro in former Brooks Brothers space on N Main. Separate sushi menu. Sunday brunch.",
+    mustTry: "Prime meatloaf, crab cakes, Firecracker sushi roll, warm gingerbread cake",
+    staff: [["Andrea","on Dray A"],["N\u2019chelle",null],["Kevin","meat sweats"],["Ginny",null]]
+  },
+  {
+    name: "Jianna", cuisine: "Modern Italian / Oyster Bar", address: "600 S Main St, 2nd Floor",
+    phone: "8647202200", phoneDisplay: "(864) 720-2200",
+    website: "https://jiannagreenville.com", yelp: "https://www.yelp.com/biz/jianna-greenville",
+    reservation: "https://www.opentable.com/r/jianna-greenville", reservationNote: "OpenTable",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.4, price: "$$$",
+    michelin: true, wine: false, hours: "Tue\u2013Sat Dinner 5pm, Sat\u2013Sun Brunch",
+    vibe: "James Beard-nominated Chef Michael Kramer. House-made pastas, raw bar, Falls Park views. 40-ft signature bar.",
+    mustTry: "House-made pastas, chilled oysters, potato gnocchi, olive oil cake",
+    staff: [["Mike","big bald blonde"],["Kraya",null],["Sadie","short blond pony"],["Derek","eager floor"],["Brandon","bar waiter"],["Andrew","John Snow"],["Rowan","mgr, tall geeky"]]
+  },
+  {
+    name: "The Matador", cuisine: "Mexican / Tequila Bar", address: "722 S Main St",
+    phone: null, phoneDisplay: null,
+    website: "https://www.matadorrestaurants.com/locations/greenville", yelp: null,
+    reservation: null, reservationNote: "Check website",
+    google: 4.0, yelpR: null, tripadvisor: null, price: "$$",
+    michelin: false, wine: false, hours: "See website for hours",
+    vibe: "Vibrant Mexican dining in the West End with two bars, rooftop deck, and extensive tequila list. Near Fluor Field.",
+    mustTry: "Scratch-made Mexican dishes, craft tequila cocktails",
+    staff: [["Jackson","squeaky clean"],["Donnie","beard, muscles, birthmark"],["Jonathan","skinny Wags"]]
+  }
+];
+
+// Stats
+const totalStaff = R.reduce((s,r) => s + r.staff.length, 0);
+const micCount = R.filter(r => r.michelin).length;
+document.getElementById('stats').textContent = `${R.length} restaurants \u00b7 ${totalStaff} staff \u00b7 ${micCount} MICHELIN recommended`;
+
+// Filters
+const filterDefs = [["all","All"],["michelin","MICHELIN"],["wine","Wine Spectator"],["fine","Fine Dining"],["walkin","Walk-in Only"]];
+const filtersEl = document.getElementById('filters');
+let activeFilter = 'all';
+filterDefs.forEach(([key,label]) => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (key === 'all' ? ' active' : '');
+  btn.textContent = label;
+  btn.dataset.key = key;
+  btn.onclick = () => { activeFilter = key; document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key)); render(); };
+  filtersEl.appendChild(btn);
+});
+
+document.getElementById('search').addEventListener('input', render);
+
+function ratingColor(v) {
+  if (v >= 4.5) return 'var(--green-good)';
+  if (v >= 4.0) return 'var(--green-ok)';
+  if (v >= 3.5) return 'var(--amber)';
+  return 'var(--red-low)';
+}
+
+function ratingHTML(label, value) {
+  if (value === null) return `<div class="rating-row"><span class="rating-label">${label}</span><span class="rating-none">\u2014</span></div>`;
+  const pct = (value / 5) * 100;
+  const col = ratingColor(value);
+  return `<div class="rating-row"><span class="rating-label">${label}</span><div class="rating-right"><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${pct}%;background:${col}"></div></div><span class="rating-val" style="color:${col}">${value}</span></div></div>`;
+}
+
+function staffHTML(staff) {
+  return staff.map(([name, note], i) => {
+    if (note) {
+      return `<span class="staff-pill has-note" onclick="this.classList.toggle('open')">${name}<span class="staff-note">${note}</span></span>`;
+    }
+    return `<span class="staff-pill">${name}</span>`;
+  }).join('');
+}
+
+let expandedIdx = null;
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const container = document.getElementById('cards');
+  
+  const filtered = R.filter((r, i) => {
+    const matchQ = !q || r.name.toLowerCase().includes(q) || r.cuisine.toLowerCase().includes(q) || r.staff.some(s => s[0].toLowerCase().includes(q) || (s[1]||'').toLowerCase().includes(q));
+    const matchF = activeFilter === 'all'
+      || (activeFilter === 'michelin' && r.michelin)
+      || (activeFilter === 'wine' && r.wine)
+      || (activeFilter === 'fine' && (r.price === '$$$' || r.price === '$$$$'))
+      || (activeFilter === 'walkin' && !r.reservation);
+    return matchQ && matchF;
+  });
+
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">No restaurants match your search.</div>'; return; }
+
+  container.innerHTML = filtered.map(r => {
+    const idx = R.indexOf(r);
+    const exp = expandedIdx === idx;
+    const cls = 'card' + (exp ? ' expanded' : '');
+
+    let badges = '';
+    if (r.michelin) badges += '<span class="badge badge-michelin">MICHELIN</span>';
+    if (r.wine) badges += '<span class="badge badge-wine">WINE SPECTATOR</span>';
+
+    let actions = '';
+    if (r.yelp) actions += `<a href="${r.yelp}" target="_blank" rel="noopener" class="action-btn btn-yelp">Yelp \u2192</a>`;
+    if (r.website) actions += `<a href="${r.website}" target="_blank" rel="noopener" class="action-btn btn-website">Website \u2192</a>`;
+    if (r.reservation) actions += `<a href="${r.reservation}" target="_blank" rel="noopener" class="action-btn btn-reserve">Reserve \u2192</a>`;
+    if (r.phone) actions += `<a href="tel:${r.phone}" class="action-btn btn-call">Call \u2192</a>`;
+
+    let detailLines = '';
+    if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
+    detailLines += `<div class="detail-line">\u23f0 ${r.hours}</div>`;
+    detailLines += `<div class="detail-line">\ud83e\ude91 ${r.reservationNote}</div>`;
+
+    return `<div class="${cls}" data-idx="${idx}">
+      <div class="card-head" onclick="toggle(${idx})">
+        <div>
+          <div class="card-name">${r.name}</div>
+          ${badges ? '<div class="card-badges">'+badges+'</div>' : ''}
+          <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
+        </div>
+        <div class="card-right">
+          <span class="staff-count">${r.staff.length}</span>
+          <span class="chevron">\u25be</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="ratings-details">
+          <div class="info-panel">
+            <div class="section-label">Ratings</div>
+            ${ratingHTML('Google', r.google)}
+            ${ratingHTML('Yelp', r.yelpR)}
+            ${ratingHTML('TripAdvisor', r.tripadvisor)}
+          </div>
+          <div class="info-panel">
+            <div class="section-label">Details</div>
+            ${detailLines}
+          </div>
+        </div>
+        <div class="section-label">The Vibe</div>
+        <p class="vibe-text">${r.vibe}</p>
+        ${r.mustTry ? '<hr class="divider"><div class="section-label">Don\u2019t Miss</div><p class="must-try-text">'+r.mustTry+'</p>' : ''}
+        <hr class="divider">
+        <div class="section-label">Your People <span style="color:var(--gold);font-size:8px;margin-left:4px">(tap for notes)</span></div>
+        <div class="staff-grid">${staffHTML(r.staff)}</div>
+        ${actions ? '<div class="actions">'+actions+'</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(idx) {
+  expandedIdx = expandedIdx === idx ? null : idx;
+  render();
+  if (expandedIdx !== null) {
+    setTimeout(() => {
+      const el = document.querySelector(`[data-idx="${idx}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
