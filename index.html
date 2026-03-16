@@ -419,6 +419,93 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .card { animation: fadeIn 0.3s ease both; }
+
+/* Try Next Section */
+.try-next {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 14px 14px;
+}
+.try-next-header {
+  background: var(--navy);
+  padding: 20px 18px 16px;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 3px solid var(--gold);
+}
+.try-next-header-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.try-next-header h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cream);
+  margin: 0;
+}
+.try-next-list {
+  display: flex;
+  flex-direction: column;
+}
+.try-next-item {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 16px 18px;
+}
+.try-next-item:last-child {
+  border-radius: 0 0 6px 6px;
+}
+.try-next-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 2px;
+}
+.try-next-name a {
+  color: var(--navy);
+  text-decoration: none;
+}
+.try-next-name a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 2px;
+}
+.try-next-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.tag-star { background: var(--michelin); color: var(--white); }
+.tag-new { background: var(--gold); color: var(--navy); }
+.tag-essential { background: var(--green-good); color: var(--white); }
+.tag-popular { background: var(--navy); color: var(--gold); }
+.try-next-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--light);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.try-next-why {
+  font-size: 14px;
+  color: var(--med);
+  line-height: 1.55;
+  margin-top: 6px;
+}
 </style>
 </head>
 <body>
@@ -435,6 +522,40 @@ body {
 </div>
 
 <div class="cards" id="cards"></div>
+
+<div class="try-next">
+  <div class="try-next-header">
+    <div class="try-next-header-label">On the Radar</div>
+    <h2>Try Next</h2>
+  </div>
+  <div class="try-next-list">
+    <div class="try-next-item">
+      <div class="try-next-name"><a href="https://www.scoundrelgvl.com" target="_blank" rel="noopener">Scoundrel</a><span class="try-next-tag tag-star">MICHELIN &#9733;</span></div>
+      <div class="try-next-meta">French Bistro &middot; $$$ &middot; 220 N Main St</div>
+      <div class="try-next-why">Greenville&rsquo;s only MICHELIN-starred restaurant. Chef Joe Cash blends Parisian bistro tradition with local ingredients. James Beard semifinalist. The bar alone is worth the visit.</div>
+    </div>
+    <div class="try-next-item">
+      <div class="try-next-name"><a href="https://hallschophousegvl.com" target="_blank" rel="noopener">Halls Chophouse</a><span class="try-next-tag tag-popular">POPULAR</span></div>
+      <div class="try-next-meta">Steakhouse / Fine Dining &middot; $$$$ &middot; 550 S Main St</div>
+      <div class="try-next-why">Top-rated steakhouse on S Main with prime cuts, she-crab soup, and Sunday gospel brunch. Legendary service&mdash;the Hall family greets every table. The place people take out-of-towners.</div>
+    </div>
+    <div class="try-next-item">
+      <div class="try-next-name"><a href="https://www.o-kusushi.com/location/o-ku-greenville/" target="_blank" rel="noopener">O-Ku</a><span class="try-next-tag tag-essential">ESSENTIAL</span></div>
+      <div class="try-next-meta">Japanese / Sushi &middot; $$$ &middot; 30 W Broad St</div>
+      <div class="try-next-why">Beautiful, precise sushi with a stacked cocktail menu. Eater Carolinas essential. Covered courtyard seating. Ask about the secret lobster salad roll topped with seared steak.</div>
+    </div>
+    <div class="try-next-item">
+      <div class="try-next-name"><a href="https://enlorestaurant.com" target="_blank" rel="noopener">Enl&#333;</a><span class="try-next-tag tag-new">COMING SUMMER 2026</span></div>
+      <div class="try-next-meta">Tasting Menu / Fine Dining &middot; $$$$ &middot; 170 Riverplace</div>
+      <div class="try-next-why">Chef Nico Abello (six consecutive Michelin stars at L&rsquo;Appart in Manhattan) is opening an intimate tasting-room restaurant under Table 301, with Reedy River views above The Lazy Goat.</div>
+    </div>
+    <div class="try-next-item">
+      <div class="try-next-name"><a href="https://www.yelp.com/biz/asada-greenville" target="_blank" rel="noopener">Asada</a><span class="try-next-tag tag-essential">ESSENTIAL</span></div>
+      <div class="try-next-meta">Latin Fusion &middot; $ &middot; 1237 Pendleton St</div>
+      <div class="try-next-why">Eater Carolinas essential. Gina Petti and Roberto Cortez serve global-inspired Latin fusion&mdash;steak tacos, burger arepas, chicken karaage tacos. Saturday brunch draws a line. Art on every wall.</div>
+    </div>
+  </div>
+</div>
 
 <div class="footer">Last updated March 2026 &middot; Greenville, SC</div>
 
