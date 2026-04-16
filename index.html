@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GVL Dining">
+<meta name="description" content="A personal dining guide to 17 restaurants in Greenville, SC — staff you know, menus, ratings, and MICHELIN recommendations.">
+<meta property="og:title" content="Greenville Dining Guide">
+<meta property="og:description" content="17 hand-picked restaurants in Greenville, SC with staff notes, in-app menus, ratings, and MICHELIN recommendations.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://greenville-dining-guide.com">
+<meta name="twitter:card" content="summary">
 <title>Greenville Dining Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -96,7 +102,8 @@ body {
   flex-wrap: wrap;
 }
 .filter-btn {
-  padding: 7px 14px;
+  padding: 12px 16px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: 20px;
   background: transparent;
@@ -390,6 +397,16 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .action-btn:active { opacity: 0.8; }
+@media (max-width: 480px) {
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .action-btn {
+    text-align: center;
+    padding: 12px 10px;
+  }
+}
 .btn-website { background: var(--navy); color: var(--gold); }
 .btn-reserve { background: var(--gold); color: var(--navy); }
 .btn-yelp { background: #d32323; color: var(--white); }
@@ -561,6 +578,50 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Menu section jump nav */
+.menu-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 20px 0;
+  position: sticky;
+  top: 0;
+  background: var(--cream);
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+.menu-nav-chip {
+  background: var(--navy);
+  color: var(--gold);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.menu-nav-chip:hover, .menu-nav-chip:focus-visible {
+  background: #243d55;
+}
+
+/* Keyboard focus styles */
+.card-head:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+.filter-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -658,20 +719,21 @@ body {
 </head>
 <body>
 
-<div class="header">
+<header class="header" role="banner">
   <div class="header-label">Personal Dining Guide</div>
   <h1>Greenville Dining</h1>
-  <div class="header-stats" id="stats"></div>
-</div>
+  <div class="header-stats" id="stats" aria-live="polite"></div>
+</header>
 
-<div class="controls">
-  <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff...">
-  <div class="filters" id="filters"></div>
-</div>
+<main role="main">
+<nav class="controls" aria-label="Search and filters">
+  <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff..." aria-label="Search restaurants">
+  <div class="filters" id="filters" role="group" aria-label="Filter restaurants"></div>
+</nav>
 
-<div class="cards" id="cards"></div>
+<div class="cards" id="cards" role="list" aria-label="Restaurant cards"></div>
 
-<div class="try-next">
+<section class="try-next" id="tryNext" aria-label="Restaurant recommendations">
   <div class="try-next-header">
     <div class="try-next-header-label">On the Radar</div>
     <h2>Try Next</h2>
@@ -703,9 +765,10 @@ body {
       <div class="try-next-why">Eater Carolinas essential. Gina Petti and Roberto Cortez serve global-inspired Latin fusion&mdash;steak tacos, burger arepas, chicken karaage tacos. Saturday brunch draws a line. Art on every wall.</div>
     </div>
   </div>
-</div>
+</section>
+</main>
 
-<div class="footer">Last updated April 2026 &middot; Greenville, SC</div>
+<footer class="footer" role="contentinfo">Last updated April 2026 &middot; Greenville, SC</footer>
 
 <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)closeMenu()">
   <div class="menu-modal">
@@ -4196,7 +4259,7 @@ const R = [
     michelin: false, wine: false, hours: "Tue\u2013Wed 5\u20139pm, Thu\u2013Sat 5\u201310pm, Bar opens 4pm",
     vibe: "High-quality seafood with a vibrant bar scene on S Main. Three owner-operators work the floor nightly. Complimentary valet. Independently owned.",
     mustTry: "Bangin\u2019 shrimp, halibut, sticky toffee pudding, ocean bread, sea scallops",
-    staff: [["Tiffany",null]]
+    staff: [["Jennifer","owner"],["Dakota","owner"],["Chris","owner"],["Josh","executive chef"],["Tiffany",null]]
   }
 ];
 
@@ -4259,6 +4322,12 @@ function render() {
     return matchQ && matchF;
   });
 
+  // Hide Try Next when search/filter is active
+  const tryNextEl = document.getElementById('tryNext');
+  if (tryNextEl) {
+    tryNextEl.style.display = (q || activeFilter !== 'all') ? 'none' : '';
+  }
+
   if (!filtered.length) { container.innerHTML = '<div class="no-results">No restaurants match your search.</div>'; return; }
 
   container.innerHTML = filtered.map(r => {
@@ -4282,8 +4351,8 @@ function render() {
     detailLines += `<div class="detail-line">\u23f0 ${r.hours}</div>`;
     detailLines += `<div class="detail-line">\ud83e\ude91 ${r.reservationNote}</div>`;
 
-    return `<div class="${cls}" data-idx="${idx}">
-      <div class="card-head" onclick="toggle(${idx})">
+    return `<div class="${cls}" data-idx="${idx}" role="listitem">
+      <div class="card-head" tabindex="0" role="button" aria-expanded="${exp}" onclick="toggle(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle(${idx})}">
         <div>
           <div class="card-name">${r.name}</div>
           ${badges ? '<div class="card-badges">'+badges+'</div>' : ''}
@@ -4333,6 +4402,19 @@ function toggle(idx) {
 render();
 
 // Menu modal
+function normalizePrice(p) {
+  if (!p) return '';
+  // Already formatted with $ or contains slash (multi-price like "18 / 33")
+  if (p.includes('$')) return p;
+  // Pure number — add $
+  if (/^\d+(\.\d+)?$/.test(p.trim())) return '$' + p.trim();
+  // Multi-price patterns like "Half Dozen 18 / Dozen 33" or "SM 12 / LG 18"
+  return p.replace(/(\b)(\d+(\.\d+)?)(\b)/g, function(m, pre, num, dec, post) {
+    // Only add $ if not already preceded by $
+    return pre + '$' + num + post;
+  });
+}
+
 function openMenu(idx) {
   const rest = R[idx];
   if (!rest) return;
@@ -4341,9 +4423,15 @@ function openMenu(idx) {
   document.getElementById('menuTitle').textContent = rest.name;
   document.getElementById('menuCuisine').textContent = rest ? rest.cuisine + ' \u00b7 ' + rest.price : '';
   const body = document.getElementById('menuBody');
-  body.innerHTML = menu.map(sec => {
+
+  // Build section jump nav chips
+  const navChips = menu.length > 2 ? '<div class="menu-nav">' + menu.map((sec, si) =>
+    `<button class="menu-nav-chip" onclick="document.getElementById('msec-${si}').scrollIntoView({behavior:'smooth',block:'start'})">${sec.s}</button>`
+  ).join('') + '</div>' : '';
+
+  const sections = menu.map((sec, si) => {
     const items = sec.items.map(it => {
-      const priceStr = it.p ? (it.p.match(/^[\d.]+$/) ? '$' + it.p : it.p) : '';
+      const priceStr = normalizePrice(it.p);
       return `<div class="menu-item">
         <div class="menu-item-left">
           <div class="menu-item-name">${it.n}</div>
@@ -4352,11 +4440,13 @@ function openMenu(idx) {
         ${priceStr ? '<div class="menu-item-price">' + priceStr + '</div>' : ''}
       </div>`;
     }).join('');
-    return `<div class="menu-section">
+    return `<div class="menu-section" id="msec-${si}">
       <div class="menu-section-name">${sec.s}</div>
       ${items}
     </div>`;
   }).join('');
+
+  body.innerHTML = navChips + sections;
   body.scrollTop = 0;
   document.getElementById('menuOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
