@@ -413,6 +413,154 @@ body {
   font-size: 16px;
 }
 
+/* Menu Button */
+.btn-menu {
+  background: var(--navy);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+/* Menu Modal */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(26,46,64,0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+}
+.menu-overlay.open { display: flex; }
+
+.menu-modal {
+  width: 100%;
+  max-width: 600px;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  .menu-modal {
+    height: 90vh;
+    max-height: 90vh;
+    margin-top: 5vh;
+    border-radius: 8px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+  }
+}
+
+.menu-header {
+  background: var(--navy);
+  padding: 18px 20px 14px;
+  border-bottom: 3px solid var(--gold);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.menu-header-info h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.2;
+  margin: 0;
+}
+.menu-header-info .menu-cuisine {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--gold);
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+.menu-close {
+  background: none;
+  border: none;
+  color: var(--cream);
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0 0 0 12px;
+  line-height: 1;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.menu-close:hover { color: var(--gold); }
+
+.menu-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0;
+}
+
+.menu-section {
+  padding: 14px 20px 6px;
+}
+.menu-section:first-child { padding-top: 16px; }
+.menu-section-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dotted #ddd8c8;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item-left { flex: 1; min-width: 0; }
+.menu-item-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dark);
+  line-height: 1.3;
+}
+.menu-item-desc {
+  font-size: 13px;
+  color: var(--light);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.menu-item-price {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.menu-footer {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  background: var(--dark-cream);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.menu-footer-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -559,7 +707,3310 @@ body {
 
 <div class="footer">Last updated April 2026 &middot; Greenville, SC</div>
 
+<div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this)closeMenu()">
+  <div class="menu-modal">
+    <div class="menu-header">
+      <div class="menu-header-info">
+        <h2 id="menuTitle"></h2>
+        <div class="menu-cuisine" id="menuCuisine"></div>
+      </div>
+      <button class="menu-close" onclick="closeMenu()" aria-label="Close menu">&times;</button>
+    </div>
+    <div class="menu-body" id="menuBody"></div>
+    <div class="menu-footer">
+      <div class="menu-footer-text">Prices may vary &middot; Ask your server about daily specials</div>
+    </div>
+  </div>
+</div>
+
 <script>
+const MENUS = {
+  "The Jones Oyster Co.": [
+    {
+      "s": "Starters & Shareables",
+      "items": [
+        {
+          "n": "Chilled Raw Oysters* on the Half Shell",
+          "d": "Served with Crackers, Lemon Wedges, Mignonette, House Made Hot Sauce, Traditional Cocktail Sauce (Check Daily Oyster Sheet for Today’s Availability)",
+          "p": "Mkt Price"
+        },
+        {
+          "n": "Chef’s Choice Oysters",
+          "d": "Chef’s Daily Selection",
+          "p": "Half Dozen MKT / Dozen MKT"
+        },
+        {
+          "n": "NOLA Grilled Gulf Oysters",
+          "d": "Garlic Butter, Herbs, Parmigiano-Reggiano, Pecorino Romano, Crusty Bread",
+          "p": "Half Dozen 18 / Dozen 33"
+        },
+        {
+          "n": "Signature Oyster* Shooters - Fiestas & Fiascos",
+          "d": "Raw Oyster*, Lunazul Blanco, Aji Amarillo Passionfruit",
+          "p": "7"
+        },
+        {
+          "n": "Signature Oyster* Shooters - So Fresh, So Clean",
+          "d": "Raw Oyster*, Effen Cucumber Vodka, Mint Simple, Lime",
+          "p": "5"
+        },
+        {
+          "n": "Signature Oyster* Shooters - Seasoned Standard",
+          "d": "Raw Oyster*, House Made Bloody Mary Mix, Tito's Handmade Vodka, House Spice Rim",
+          "p": "5"
+        },
+        {
+          "n": "Signature Oyster* Shooters - Non-alcoholic",
+          "d": "Non-alcoholic version of oyster shooter",
+          "p": "3"
+        },
+        {
+          "n": "Half Pound Peel and Eat Shrimp",
+          "d": "Lemon, Crackers. Available Chilled (Cooked in House Spices, Lemon, Cocktail Sauce) or Warm (Tossed in Butter and Spices)",
+          "p": "18"
+        },
+        {
+          "n": "Jones Famous Cheddar Hushpuppies",
+          "d": "",
+          "p": "8"
+        },
+        {
+          "n": "Smoked Carolina Fish Dip",
+          "d": "Jalapeños, Red Onions, Club Crackers, Carrot",
+          "p": "15"
+        },
+        {
+          "n": "New England Clam Chowdah",
+          "d": "",
+          "p": "12"
+        }
+      ]
+    },
+    {
+      "s": "Plates",
+      "items": [
+        {
+          "n": "Lobster Roll",
+          "d": "Maine (Chilled Lobster, Mayo, Parsley, Lemon) or Connecticut (Warm Lobster, Melted Butter). Served on Butter Toasted Top Sliced Bun with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "29"
+        },
+        {
+          "n": "New England Fried Clam Roll",
+          "d": "Fried Ipswich Whole Belly Clams, Charred Lemon Caper Tartar Sauce, Butter Toasted Top Sliced Bun. Served with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "25"
+        },
+        {
+          "n": "Charleston Shrimp Burger",
+          "d": "House Made Shrimp Patty, Lettuce, Tomato, Charred Lemon Caper Tartar Sauce, Brioche Bun. Served with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "16"
+        },
+        {
+          "n": "Carolina Shrimp Po’Boy",
+          "d": "Fried Shrimp, Lettuce, Tomato, Tomato-Horseradish Tartar Sauce, French Roll. Served with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "16"
+        },
+        {
+          "n": "Gulf Oyster Po’Boy",
+          "d": "Flash Fried Oysters, Lettuce, Tomato, Tomato-Horseradish Tartar Sauce, French Roll. Served with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "18"
+        },
+        {
+          "n": "Captain’s Choice Fresh Catch Sandwich",
+          "d": "Blackened, Broiled, or Fried, Lettuce, Tomato, Charred Lemon-Caper Tartar Sauce, Brioche Bun. Served with Creamy Cole Slaw and choice of Seasoned House Chips or Hand Cut Seasoned Fries.",
+          "p": "Mkt $"
+        },
+        {
+          "n": "Shrimp Louie Salad (aka The King of Salads)",
+          "d": "Growing Green Family Farm Lettuces, Chilled Shrimp, Grilled Asparagus, Hard Boiled Egg, Heirloom Cherry Tomatoes, Cucumber, Radish, Louie Dressing",
+          "p": "18"
+        },
+        {
+          "n": "Low Country Crab Rice",
+          "d": "Charleston Gold Rice, Bell Peppers, Onions, Celery, Bacon, Claw Crab Meat, Fried Egg*, Crispy Garlic, Sesame Seeds",
+          "p": "22"
+        },
+        {
+          "n": "Fish & Chips",
+          "d": "Narragansett Beer Battered Fresh Fish, Jones Hand Cut Seasoned Fries, Creamy Cole Slaw, Charred Lemon Caper Tartar Sauce",
+          "p": "20"
+        }
+      ]
+    },
+    {
+      "s": "Sides",
+      "items": [
+        {
+          "n": "Fries",
+          "d": "",
+          "p": "5"
+        },
+        {
+          "n": "Chips",
+          "d": "",
+          "p": "5"
+        },
+        {
+          "n": "Asparagus",
+          "d": "",
+          "p": "5"
+        },
+        {
+          "n": "Cole Slaw",
+          "d": "",
+          "p": "5"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Key Lime Pie",
+          "d": "",
+          "p": "8"
+        },
+        {
+          "n": "Argle’s Car (Dessert Cocktail)",
+          "d": "Horchata, Cayéya Reposado Tequila, Mexican Hot Chocolate, Cinnamon Whipped Cream",
+          "p": "15"
+        }
+      ]
+    }
+  ],
+  "Northampton Wine + Dine": [
+    {
+      "s": "Starters & Small Plates",
+      "items": [
+        {
+          "n": "Strawberry Gazpacho",
+          "d": "Cucumber, Tomato, Apple Cider Vinegar, Lime + Balsamic Reduction",
+          "p": "10"
+        },
+        {
+          "n": "Spinach + Artichoke Dip",
+          "d": "Cream Cheese, Garlic, Spinach, Artichokes, Mozzarella, Parmesan + Toasted Pita Bread",
+          "p": "12"
+        },
+        {
+          "n": "Assorted Olives",
+          "d": "Greek + Italian Olives Pitted + Unpitted + Herbs de Provence-Orange Citrus Brine",
+          "p": "6"
+        },
+        {
+          "n": "Cheese & Charcuterie",
+          "d": "Bresaola, Calabrese Salami, Six Month Manchego, Smoked Gouda, Red Seedless Grapes + Honey",
+          "p": "16"
+        },
+        {
+          "n": "Grilled Brie",
+          "d": "Grilled Brie, Red Wine Cherry Compote, South Carolina Honey, Maple-Glazed Nuts + French Bread",
+          "p": "15"
+        },
+        {
+          "n": "Hot Chili Seafood",
+          "d": "Shrimp, Scallops, Calamari, Peppers, Onions + Spicy Sambal-Hoisin Sauce",
+          "p": "16"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Mixed Berry Salad",
+          "d": "Mesclun Greens, Mixed Berries, Candied Nuts, Goat Cheese, + Orange Vinaigrette",
+          "p": "12"
+        },
+        {
+          "n": "House Salad",
+          "d": "Mixed Greens, Tomatoes, Cucumbers, Pecorino + Green Goddess Dressing",
+          "p": "10"
+        }
+      ]
+    },
+    {
+      "s": "Entrees",
+      "items": [
+        {
+          "n": "Moroccan Chickpea Cake",
+          "d": "Chickpea Cake, Quinoa Salad + Cashew Curry Sauce",
+          "p": "18"
+        },
+        {
+          "n": "*Pan-Seared Scallops",
+          "d": "3 Large Scallops, Linguine Pasta, Roasted Vegetable Sauce, Pistachio Pesto + Pecorino",
+          "p": "36"
+        },
+        {
+          "n": "*Pan Seared Salmon",
+          "d": "8 oz. Canadian Salmon, Green Pea Risotto, Asparagus + Whole Grain Mustard Beurre Blanc",
+          "p": "36"
+        },
+        {
+          "n": "Shrimp & Grits",
+          "d": "6 Sauteed Broadwater Shrimp with Country Ham Cream, Red Peppers, Roasted Tomato, Crispy Country Ham, Adluh Mills Cheddar Cheese Grits + Scallions",
+          "p": "26"
+        },
+        {
+          "n": "*Pan Seared NC Trout",
+          "d": "Filleted NC Trout, Walnut Beurre Noisette Adluh Mills Cheddar Cheese Grits + Green Collards",
+          "p": "32"
+        },
+        {
+          "n": "*Lamb Chop",
+          "d": "Herb Grilled Lamb, Asparagus Smoked Gouda Potatoes Au Gratin + Heb Yogurt Sauce",
+          "p": "40"
+        },
+        {
+          "n": "*Bone-In Pork Chop",
+          "d": "12oz. Dry Aged Bone-In Pork Chop, Mashed Sweet Potatoes, Collard Greens + Mustard BBQ Sauce",
+          "p": "32"
+        },
+        {
+          "n": "*Black Angus Burger",
+          "d": "8 oz. Black Angus Burger, Caramelized Onion Marmalade, Bibb Lettuce, Tomato, Toasted Brioche Bun + French Fries. Add Tillamook Sharp Cheddar Cheese $1.50, Add Two Slices Applewood Smoked Bacon $3",
+          "p": "14"
+        },
+        {
+          "n": "Beef Short Rib",
+          "d": "Cheerwine Glaze, Cherry Compote, Yukon Gold Mashed Potatoes, Roasted Baby Carrots + Jus",
+          "p": "42"
+        },
+        {
+          "n": "*Steak Frites",
+          "d": "6 oz. Flat Iron Steak French Fries + Roasted Garlic Butter",
+          "p": "25"
+        },
+        {
+          "n": "*Filet Mignon",
+          "d": "8 oz. Filet Mignon, Yukon Gold Mashed Potatoes, Asparagus + Herbed-Cheese Butter",
+          "p": "45"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Creme Brulee",
+          "d": "Vanilla Bean Custard, Caramelized Sugar, Chantilly Whipped Cream + Berries",
+          "p": "10"
+        },
+        {
+          "n": "Chocolate Mousse",
+          "d": "Dark Chocolate + Chantilly Whipped Cream",
+          "p": "10"
+        },
+        {
+          "n": "Bread Pudding",
+          "d": "Croissants in Vanilla White Chocolate Custard, Berry Coulis, Berries + Creme Anglaise",
+          "p": "10"
+        }
+      ]
+    }
+  ],
+  "Soby’s New South Cuisine": [
+    {
+      "s": "Southern Taste",
+      "items": [
+        {
+          "n": "Fried Green Tomatoes",
+          "d": "Haricots Verts, Pimento Fondue, Crispy Carrots",
+          "p": "11"
+        },
+        {
+          "n": "Wildly Loved Mushroom Risotto",
+          "d": "Mushroom Dashi, Anson Mills Nostrale Rice, Forx Farm 12-Month Parmesan",
+          "p": "14"
+        },
+        {
+          "n": "Spicy Pimento Cheese",
+          "d": "Crispy Pita, Pickled Okra, Espelette",
+          "p": "9"
+        },
+        {
+          "n": "Winter Citrus Cured Salmon",
+          "d": "Tyger River Red Leaf Lettuce, Orange Grove Plantation Citrus, Rise Bakery Sourdough Breadcrumbs, Cara Cara Vinaigrette",
+          "p": "14"
+        },
+        {
+          "n": "Country Ham and Brussels",
+          "d": "Herb Whipped Goat Cheese, Hot Honey",
+          "p": "12"
+        },
+        {
+          "n": "Baked “Brie”",
+          "d": "Sweet Grass Dairy Camembert, Pickled Cranberries, Toasted Rise Bakery Country Loaf",
+          "p": "16"
+        }
+      ]
+    },
+    {
+      "s": "Soups & Salads",
+      "items": [
+        {
+          "n": "Soby’s She Crab Soup",
+          "d": "Aged Sherry, Crab Roe",
+          "p": "11"
+        },
+        {
+          "n": "Beet and Goat Cheese Salad",
+          "d": "Clem’s Organic Gardens Roasted Beets, Split Creek Farm Goat Cheese, Arugula, Sunflower Seeds, Shaved Red Onion, Toasted Honey Vinaigrette",
+          "p": "14"
+        },
+        {
+          "n": "Tyger River Greens Salad",
+          "d": "Clemson Bleu Cheese, Candied Pecans, North Carolina Apples, Apple Cider Vinaigrette",
+          "p": "13"
+        },
+        {
+          "n": "Chopped Salad",
+          "d": "Romaine, Boiled Egg, Crisp Bacon, Dried Cranberries, Parmesan and Cracked Black Pepper Dressing",
+          "p": "12"
+        }
+      ]
+    },
+    {
+      "s": "Sides (Sized to Share)",
+      "items": [
+        {
+          "n": "Sweet Corn Maque Choux",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Broccolini",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Haricots Verts",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Anson Mills Baked Cheddar Grits",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Mashed Potatoes",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Bradford Farm Braised Collard Greens",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Benton’s Bacon Mac and Cheese",
+          "d": "",
+          "p": "9"
+        }
+      ]
+    },
+    {
+      "s": "Entrees",
+      "items": [
+        {
+          "n": "Roasted Atlantic Grouper",
+          "d": "Roasted Brussels Sprouts, Heirloom Winter Squash, Pumpkin Spice Stone Mountain Pecans, Brown Butter Jus",
+          "p": "42"
+        },
+        {
+          "n": "Crab Cakes",
+          "d": "Sweet Corn Maque Choux, Haricots Verts, Mashed Potatoes, Remoulade",
+          "p": "29"
+        },
+        {
+          "n": "Soby’s Fried Chicken",
+          "d": "Joyce Farm Bone-In Chicken Breast, Sweet Water Valley Cheddar and Benton’s Bacon Mac and Cheese, Broccolini, Hot Honey",
+          "p": "26"
+        },
+        {
+          "n": "Seasonal Vegetable Plate",
+          "d": "Chefs Curated Selection of Local Farm Fresh Veggies and Locally Milled Grains",
+          "p": "21"
+        },
+        {
+          "n": "Grilled Salmon",
+          "d": "Anson Mills Farro Gran Arso, Vadouvan Cauliflower, Lime, Miso Beurre Blanc, Basil Oil",
+          "p": "32"
+        },
+        {
+          "n": "Braised Beef Short Rib",
+          "d": "Roasted Garlic Mashed Potatoes, Stewed Green Beans, Sassafras Spiced Peanuts, Red Wine Braisage",
+          "p": "38"
+        },
+        {
+          "n": "Shrimp and Grits",
+          "d": "Anson Mills White Grits, Andouille Sausage, Piquillo Peppers, Grana Padano, Tarragon-Tomato Cream Sauce",
+          "p": "26"
+        },
+        {
+          "n": "Crispy Duck Leg Confit",
+          "d": "Bradford Farm Covington Sweet Potatoes, Local Braised Winter Greens, Country Ham Velouté",
+          "p": "32"
+        },
+        {
+          "n": "Heritage Farm Bone-In Pork Chop",
+          "d": "Anson Mills Carolina Gold Rice and Sea Island Red Pea Hoppin’ John, Preserved Tomato, Bradford Farm Collard Greens, Pot Likker Gastrique",
+          "p": "36"
+        },
+        {
+          "n": "Braveheart Angus Beef Filet*",
+          "d": "Roasted Lion’s Mane Mushrooms, Haricots Verts, Crispy Mashed Potatoes, Truffle Compound Butter, Umami Beef Jus",
+          "p": "49"
+        },
+        {
+          "n": "Add 6 Shrimp",
+          "d": "Added to any entrée or salad",
+          "p": "11"
+        },
+        {
+          "n": "Add 1 Crab Cake",
+          "d": "Added to any entrée or salad",
+          "p": "12"
+        }
+      ]
+    },
+    {
+      "s": "Dessert",
+      "items": [
+        {
+          "n": "White Chocolate Banana Cream Pie",
+          "d": "Short Crust, White Chocolate Banana Pastry Cream, Shaved White Chocolate",
+          "p": "9"
+        },
+        {
+          "n": "Sweet Potato Cheesecake",
+          "d": "Roasted White Chocolate Cream, Orange Anglaise",
+          "p": "12"
+        },
+        {
+          "n": "Southern Buttermilk Pie",
+          "d": "North Carolina Apple Namelaka, Caramelized Apple, Toasted Almonds",
+          "p": "10"
+        },
+        {
+          "n": "Duke’s Mayo Chocolate Cake",
+          "d": "Dark Chocolate Ganache, Honey Pollen, House Made Rosemary Ice Cream",
+          "p": "12"
+        },
+        {
+          "n": "Sticky Butter Toffee Pudding Cake (gf)",
+          "d": "Toffee Sauce, House Made Butterscotch Pecan Ice Cream",
+          "p": "10"
+        }
+      ]
+    }
+  ],
+  "Rick Erwin’s West End Grille": [
+    {
+      "s": "Steaks & Chops",
+      "items": [
+        {
+          "n": "FILET MIGNON | 7 oz",
+          "d": "",
+          "p": "58"
+        },
+        {
+          "n": "FILET MIGNON | 11 oz",
+          "d": "",
+          "p": "78"
+        },
+        {
+          "n": "PRIME NEW YORK STRIP | 14 oz",
+          "d": "",
+          "p": "79"
+        },
+        {
+          "n": "PRIME DELMONICO RIBEYE | 16 oz",
+          "d": "",
+          "p": "76"
+        },
+        {
+          "n": "PRIME COWBOY RIBEYE | 20 oz",
+          "d": "",
+          "p": "95"
+        },
+        {
+          "n": "PORTERHOUSE | 24 oz",
+          "d": "",
+          "p": "115"
+        },
+        {
+          "n": "DRY-AGED KANSAS CITY STRIP | 16 oz",
+          "d": "",
+          "p": "74"
+        },
+        {
+          "n": "DRY-AGED DELMONICO RIBEYE | 16 oz",
+          "d": "",
+          "p": "79"
+        },
+        {
+          "n": "DOMESTIC LAMB CHOPS",
+          "d": "",
+          "p": "72"
+        },
+        {
+          "n": "VEAL CHOP | 16 oz",
+          "d": "",
+          "p": "70"
+        }
+      ]
+    },
+    {
+      "s": "Enhancements",
+      "items": [
+        {
+          "n": "The Company Crab Cake",
+          "d": "",
+          "p": "20"
+        },
+        {
+          "n": "Cold-Water Lobster Tail",
+          "d": "",
+          "p": "32"
+        },
+        {
+          "n": "Fried Lobster Tail",
+          "d": "",
+          "p": "32"
+        },
+        {
+          "n": "Seared Scallops (2)",
+          "d": "",
+          "p": "28"
+        },
+        {
+          "n": "Oscar Style",
+          "d": "",
+          "p": "28"
+        },
+        {
+          "n": "Rick’s Black & Bleu",
+          "d": "",
+          "p": "5"
+        },
+        {
+          "n": "Béarnaise Sauce",
+          "d": "",
+          "p": "4"
+        },
+        {
+          "n": "Truffle Chive Butter",
+          "d": "",
+          "p": "9"
+        },
+        {
+          "n": "Truffle Peppercorn Sauce",
+          "d": "",
+          "p": "7"
+        }
+      ]
+    },
+    {
+      "s": "Starters",
+      "items": [
+        {
+          "n": "OSETRA CAVIAR",
+          "d": "whipped ricotta, red onion, chives, minced egg, grilled baguette",
+          "p": "market"
+        },
+        {
+          "n": "CRISPY CALAMARI",
+          "d": "squash, zucchini, okra, lemon, jalapeño tartar sauce",
+          "p": "19"
+        },
+        {
+          "n": "SHRIMP COCKTAIL",
+          "d": "chilled tiger shrimp, horseradish, atomic cocktail sauce",
+          "p": "18"
+        },
+        {
+          "n": "EAST COAST OYSTERS*",
+          "d": "served on the half shell by the half-dozen or dozen with spicy cocktail sauce, mignonette, fresh citrus, crackers",
+          "p": "18/35"
+        },
+        {
+          "n": "VEAL MEATBALLS",
+          "d": "pomodoro and shaved parmesan",
+          "p": "17"
+        },
+        {
+          "n": "NOLA BBQ SHRIMP",
+          "d": "jumbo shrimp, bbq butter, crouton",
+          "p": "19"
+        },
+        {
+          "n": "BAKED OYSTERS",
+          "d": "herb buttered breadcrumbs, lemon",
+          "p": "22"
+        },
+        {
+          "n": "WAGYU CARPACCIO*",
+          "d": "horseradish crema, beech mushroom, pickled mustard, pickled onions, parmesan, crostini",
+          "p": "16"
+        },
+        {
+          "n": "SEAFOOD TOWER*",
+          "d": "shrimp cocktail, oysters, half lobster, snow crab, served with classic condiments",
+          "p": "85/170"
+        }
+      ]
+    },
+    {
+      "s": "Soup & Salad",
+      "items": [
+        {
+          "n": "SHE CRAB SOUP",
+          "d": "lump crab, creamed sherry",
+          "p": "10"
+        },
+        {
+          "n": "FRENCH ONION SOUP",
+          "d": "rich beef broth, caramelized onions, crouton, swiss and parmesan cheese",
+          "p": "10"
+        },
+        {
+          "n": "BURRATA",
+          "d": "baby heirloom tomatoes, basil pesto, balsamic, fresh bread",
+          "p": "16"
+        },
+        {
+          "n": "GOURMET GREENS",
+          "d": "mixed greens, cranberries, danish blue cheese, slivered almonds, balsamic vinaigrette",
+          "p": "9"
+        },
+        {
+          "n": "THE WEDGE",
+          "d": "iceberg lettuce, crumbled bacon, grape tomatoes, crispy onions, danish blue cheese dressing & crumbles",
+          "p": "10"
+        },
+        {
+          "n": "CAESAR SALAD",
+          "d": "romaine hearts, buttered breadcrumbs, parmigiano reggiano, peppercorn parmesan dressing",
+          "p": "10"
+        }
+      ]
+    },
+    {
+      "s": "Signature Steak Features",
+      "items": [
+        {
+          "n": "SIGNATURE SURF & TURF*",
+          "d": "center cut filet mignon, company crab cake, whipped potatoes, asparagus (substitute lobster tail +20)",
+          "p": "4 oz: 45, 7 oz: 72, 11 oz: 86"
+        },
+        {
+          "n": "STEAK TRIO*",
+          "d": "4oz meats by linz filet, 5oz brasstown strip, 4oz prime flat iron, crispy brussels, truffle salt, chimichurri",
+          "p": "75"
+        },
+        {
+          "n": "TOMAHAWK RIBEYE FOR TWO*",
+          "d": "38 oz, sliced and served family style with a choice of two sides, and a trio of sauces - bearnaise, peppercorn, truffle butter",
+          "p": "195"
+        }
+      ]
+    },
+    {
+      "s": "Entrees",
+      "items": [
+        {
+          "n": "ATLANTIC SALMON*",
+          "d": "leeks, squash, zucchini, fennel fricasse, saffron cream sauce",
+          "p": "38"
+        },
+        {
+          "n": "SEARED AHI TUNA*",
+          "d": "baby bok choy, edamame, mirin-soy glaze, toasted sesame, wasabi aioli",
+          "p": "32"
+        },
+        {
+          "n": "SEARED SCALLOPS",
+          "d": "caramelized shallot purée, spring peas, confit fennel, prosciutto crumbs",
+          "p": "45"
+        },
+        {
+          "n": "STEAK AU POIVRE*",
+          "d": "8 oz prime flat iron, truffle peppercorn sauce, crispy onions",
+          "p": "42"
+        },
+        {
+          "n": "CRAB CAKES FOR A CAUSE",
+          "d": "two jumbo lump crab cakes, lobster creamed corn, arugula, remoulade",
+          "p": "42"
+        }
+      ]
+    },
+    {
+      "s": "Italian Favorites",
+      "items": [
+        {
+          "n": "LEMON CHICKEN PICCATA",
+          "d": "pan seared airline chicken breast, whipped potatoes, garlic green beans, candied-lemon caper sauce",
+          "p": "33"
+        },
+        {
+          "n": "VEAL MARSALA",
+          "d": "pan seared veal tenderloin, sauteed baby spinach, crimini mushroom marsala sauce",
+          "p": "56"
+        },
+        {
+          "n": "LINGUINE PESCATORE",
+          "d": "sautéed calamari, scallops, shrimp, clams, linguini, chablis & garlic tomato broth",
+          "p": "34"
+        },
+        {
+          "n": "BRONZINO ARROSTO",
+          "d": "pan seared bronzini, roasted broccolini, charred lemon gremolata, white wine butter sauce",
+          "p": "44"
+        },
+        {
+          "n": "ITALIAN SAUSAGE RIGATONI",
+          "d": "italian sausage ragu, ricotta, grated pecorino, fine herbs",
+          "p": "32"
+        },
+        {
+          "n": "KING CRAB RAVIOLI",
+          "d": "king crab, ricotta ravioli, fine herbs, saffron crème fraîche sauce",
+          "p": "44"
+        },
+        {
+          "n": "CHICKEN ALFREDO FETTUCCINI",
+          "d": "pan seared chicken breast, blackened alfredo sauce, fettuccini, fine herbs",
+          "p": "28"
+        }
+      ]
+    },
+    {
+      "s": "Sides",
+      "items": [
+        {
+          "n": "Grilled Asparagus",
+          "d": "",
+          "p": "market"
+        },
+        {
+          "n": "Creamed Spinach w/ smoked bacon",
+          "d": "",
+          "p": "13"
+        },
+        {
+          "n": "Jumbo Onion Rings",
+          "d": "",
+          "p": "12"
+        },
+        {
+          "n": "Crispy Brussels w/ bacon jam",
+          "d": "",
+          "p": "13"
+        },
+        {
+          "n": "Hand-Cut Truffle Parmesan Fries",
+          "d": "",
+          "p": "12"
+        },
+        {
+          "n": "Bucatini Amatriciana",
+          "d": "",
+          "p": "12"
+        },
+        {
+          "n": "Five-Cheese Whipped Potatoes",
+          "d": "",
+          "p": "13"
+        },
+        {
+          "n": "Balsamic & Goat Cheese Mushrooms",
+          "d": "",
+          "p": "14"
+        },
+        {
+          "n": "Rick’s au Gratin Potatoes",
+          "d": "",
+          "p": "15"
+        },
+        {
+          "n": "Five-Cheese Macaroni",
+          "d": "add lobster $19 | add truffle $9",
+          "p": "14"
+        }
+      ]
+    },
+    {
+      "s": "Three for $49 (Prix Fixe)",
+      "items": [
+        {
+          "n": "SOUP/SALAD Options",
+          "d": "Gourmet Greens, She Crab Soup, Caesar Salad",
+          "p": "Included"
+        },
+        {
+          "n": "ENTRÉE Options",
+          "d": "Atlantic Salmon, Italian Sausage Rigatoni, Steak Au Poivre*",
+          "p": "Included"
+        },
+        {
+          "n": "DESSERT Options",
+          "d": "Crème Brûlée, Key Lime Pie",
+          "p": "Included"
+        }
+      ]
+    }
+  ],
+  "Tahini Middle Eastern Eatery": [
+    {
+      "s": "Appetizers & Mezzi",
+      "items": [
+        {
+          "n": "Baba Ghanouj",
+          "d": "Roasted eggplant dip with tahini, garlic, and lemon.",
+          "p": "7.99"
+        },
+        {
+          "n": "Hummus",
+          "d": "Traditional chickpea dip with tahini and olive oil.",
+          "p": "6.00"
+        },
+        {
+          "n": "Falafels",
+          "d": "Crispy fried chickpea and herb fritters served with tahini sauce.",
+          "p": "5.99"
+        },
+        {
+          "n": "Za'atar Fries",
+          "d": "Thick-cut fries seasoned with za'atar and served with harissa and lemony garlic sauce.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Kibbeh",
+          "d": "Savory meat and bulgur shells stuffed with spiced ground beef.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Grape Leaves (Dolma)",
+          "d": "Rice and herb stuffed grape leaves.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Fattoush Salad",
+          "d": "Middle Eastern bread salad with mixed greens and vegetables.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Tabouli",
+          "d": "Finely chopped parsley salad with tomatoes, mint, onion, and bulgur.",
+          "p": "Not listed"
+        }
+      ]
+    },
+    {
+      "s": "Wraps",
+      "items": [
+        {
+          "n": "Chicken Shawarma Wrap",
+          "d": "Thinly sliced marinated chicken with garlic sauce and pickles.",
+          "p": "12.00"
+        },
+        {
+          "n": "Lamb Gyro Wrap",
+          "d": "Traditional lamb gyro meat with toppings in a wrap.",
+          "p": "12.00"
+        },
+        {
+          "n": "Chicken Gyro Wrap",
+          "d": "Marinated chicken gyro meat in a wrap.",
+          "p": "12.00"
+        },
+        {
+          "n": "Cauliflower & Falafel Wrap",
+          "d": "Vegetarian wrap with roasted cauliflower and falafel.",
+          "p": "12.00"
+        }
+      ]
+    },
+    {
+      "s": "Entrees & Platters",
+      "items": [
+        {
+          "n": "Meat Shawarma Platter",
+          "d": "Choice of beef or chicken shawarma served as a platter with sides.",
+          "p": "15.99"
+        },
+        {
+          "n": "Lamb Chops",
+          "d": "Grilled marinated lamb chops.",
+          "p": "22.99"
+        },
+        {
+          "n": "Falafel over Rice",
+          "d": "Crispy falafels served on a bed of seasoned rice.",
+          "p": "12.00"
+        },
+        {
+          "n": "Lamb Kabobs",
+          "d": "Grilled skewers of seasoned lamb.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Jerusalem Beef Shawarma Pizza",
+          "d": "A unique pizza topped with beef shawarma and Middle Eastern spices.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Build Your Own (Pita, Bowl, or Plate)",
+          "d": "Choice of protein (Chicken/Beef Shawarma, Falafel, Kabobs) served in a pita, over rice/salad, or as a full plate.",
+          "p": "Varies"
+        }
+      ]
+    },
+    {
+      "s": "Specialty Menus",
+      "items": [
+        {
+          "n": "Taste of Lebanon",
+          "d": "A comprehensive tasting menu featuring 7 appetizers (mezzi), an entree, and dessert.",
+          "p": "55.00 per person"
+        }
+      ]
+    },
+    {
+      "s": "Desserts & Drinks",
+      "items": [
+        {
+          "n": "Baklava",
+          "d": "Traditional flaky pastry with nuts and honey syrup.",
+          "p": "Not listed"
+        },
+        {
+          "n": "Mint Lemonade",
+          "d": "Fresh and refreshing house-made mint lemonade.",
+          "p": "6.99"
+        }
+      ]
+    }
+  ],
+  "Curean": [
+    {
+      "s": "Charcuterie",
+      "items": [
+        {
+          "n": "Build Your Own Board",
+          "d": "Choose from a flavorful array of meats, cheeses, crackers, breads and accompaniments.",
+          "p": "15/person"
+        },
+        {
+          "n": "Chefs Choice Board",
+          "d": "Curean's curated selection.",
+          "p": "13/person"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Arugula Salad",
+          "d": "Pickled strawberry, fried goat cheese, za'atar pistachios, fennel, focaccia croutons, oregano dressing.",
+          "p": "14"
+        },
+        {
+          "n": "Greek Village Salad",
+          "d": "Marinated tomatoes, cucumbers, red onion, kalamata olive, whipped feta, dill.",
+          "p": "14"
+        },
+        {
+          "n": "Salad Protein Add-ons",
+          "d": "Chicken thigh (10), royal red shrimp (18), 8oz filet (26).",
+          "p": "Varies"
+        }
+      ]
+    },
+    {
+      "s": "Raw Bar",
+      "items": [
+        {
+          "n": "Oysters on the Half Shell",
+          "d": "East or west coast, shucked to order, preserved lemon mignonette, housemade hot sauce, lemon.",
+          "p": "MKP"
+        },
+        {
+          "n": "Beef Tartare",
+          "d": "Cut to order, crispy capers, aioli, shallot, za'atar, yolk, grilled house focaccia.",
+          "p": "20"
+        }
+      ]
+    },
+    {
+      "s": "Shareables",
+      "items": [
+        {
+          "n": "Bread Service",
+          "d": "Feta & herb garlic oil, house focaccia.",
+          "p": "8"
+        },
+        {
+          "n": "Marinated Olives",
+          "d": "Castelvetranos, kalamatas, golden raisins, calabrese pepper.",
+          "p": "6"
+        },
+        {
+          "n": "Cabbage",
+          "d": "Braised cabbage, lemon ricotta, gremolata, crispy prosciutto, focaccia breadcrumb.",
+          "p": "14"
+        },
+        {
+          "n": "Shrimp Santorini",
+          "d": "Royal red shrimp, savory tomato sauce, feta, kalamata olive, fresh parsley, house focaccia.",
+          "p": "20"
+        },
+        {
+          "n": "Fritto Misto",
+          "d": "Crispy calamari, shrimp, green beans, capers & basil, lemon, aioli.",
+          "p": "18"
+        },
+        {
+          "n": "Spanakopita Pasta",
+          "d": "Cucina del borgo handmade campanelle, feta garlic cream, sauteed spinach, focaccia breadcrumb, fresh cracked black pepper.",
+          "p": "18"
+        },
+        {
+          "n": "Lamb Lollipops",
+          "d": "Herb orzo, charred asparagus & radish salad, romesco.",
+          "p": "30"
+        },
+        {
+          "n": "Crispy Potatoes",
+          "d": "Parmesan, lemon garlic aioli, urfa biber.",
+          "p": "14"
+        },
+        {
+          "n": "Greek Board",
+          "d": "Dolmades, spanakopita, gyro meat, feta cheese, tzatziki, kalamata olives, grilled pita bread.",
+          "p": "28"
+        }
+      ]
+    },
+    {
+      "s": "Large Plates",
+      "items": [
+        {
+          "n": "Greek Chicken & Potatoes",
+          "d": "Chicken thigh, lemon potatoes, green beans & cherry tomatoes.",
+          "p": "20"
+        },
+        {
+          "n": "8 oz Filet",
+          "d": "Potato pave, fennel salad, melted leeks, marigold sauce.",
+          "p": "38"
+        },
+        {
+          "n": "Ricotta Gnocchi",
+          "d": "Cap & petal mushrooms, sauteed kale, spicy italian sausage, san marzano tomato, parmesan.",
+          "p": "26"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Gelato",
+          "d": "Rotating flavors.",
+          "p": "6"
+        },
+        {
+          "n": "Baklava Cheesecake",
+          "d": "Cheesecake mousse, pistachios, fig jam.",
+          "p": "14"
+        },
+        {
+          "n": "Chocolate Date Cake",
+          "d": "Gf chocolate cake, date ganache, date crumble, caramel.",
+          "p": "14"
+        }
+      ]
+    }
+  ],
+  "Ristorante Bergamo": [
+    {
+      "s": "Antipasti / Zuppe",
+      "items": [
+        {
+          "n": "Basket of focaccia",
+          "d": "",
+          "p": "7"
+        },
+        {
+          "n": "Bruschetta",
+          "d": "2 pieces grilled bread with tomato mixture",
+          "p": "14"
+        },
+        {
+          "n": "Prosciutto crudo di ‘Carpegna’ DOP",
+          "d": "Available with fresh figs OR melon for $24",
+          "p": "22"
+        },
+        {
+          "n": "Affettati misti",
+          "d": "mixed Italian salumi with cheese & pickled vegetables",
+          "p": "27"
+        },
+        {
+          "n": "Beef carpaccio",
+          "d": "",
+          "p": "20"
+        },
+        {
+          "n": "Salame (3 types) with fresh figs",
+          "d": "",
+          "p": "20"
+        },
+        {
+          "n": "Bresaola with arugula and goat cheese",
+          "d": "",
+          "p": "21"
+        },
+        {
+          "n": "Smoked salmon plate “Italian Style”",
+          "d": "olive oil & lemon, caper berries & onion",
+          "p": "23"
+        },
+        {
+          "n": "Grilled octopus",
+          "d": "",
+          "p": "24"
+        },
+        {
+          "n": "Escargot",
+          "d": "classic escargot with butter, garlic & parsley",
+          "p": "23"
+        },
+        {
+          "n": "Eggplant Parmigiana",
+          "d": "",
+          "p": "20"
+        },
+        {
+          "n": "Minestrone",
+          "d": "Classic vegetable soup",
+          "p": "12"
+        }
+      ]
+    },
+    {
+      "s": "Insalate",
+      "items": [
+        {
+          "n": "Insalata di Cesare",
+          "d": "classic caesar salad with baby red romaine",
+          "p": "17"
+        },
+        {
+          "n": "Insalata della casa",
+          "d": "arugula, Italian radicchio with house dressing",
+          "p": "17"
+        },
+        {
+          "n": "Arugula",
+          "d": "with grilled apple, pear, pineapple and gorgonzola",
+          "p": "17"
+        },
+        {
+          "n": "Caprese",
+          "d": "fresh Italian mozzarella di bufala w/farm-fresh heirloom tomatoes",
+          "p": "23"
+        },
+        {
+          "n": "Truffle burrata with heirloom tomatoes",
+          "d": "",
+          "p": "24"
+        },
+        {
+          "n": "Fior di latte",
+          "d": "fresh Italian mozzarella w/farm-fresh heirloom tomatoes",
+          "p": "22"
+        }
+      ]
+    },
+    {
+      "s": "Pasta / Risotto",
+      "items": [
+        {
+          "n": "Fresh WHITE WINTER TRUFFLES",
+          "d": "choice of risotto, fettuccine, or tagliarini",
+          "p": "250"
+        },
+        {
+          "n": "Fresh BLACK WINTER TRUFFLES",
+          "d": "choice of risotto, fettuccine, or tagliarini",
+          "p": "100"
+        },
+        {
+          "n": "Risotto del Giorno",
+          "d": "with shrimp & artichoke",
+          "p": "35"
+        },
+        {
+          "n": "Linguine with shrimp",
+          "d": "sauteed with arugula, garlic & grape tomato",
+          "p": "33"
+        },
+        {
+          "n": "Linguine alle vongole",
+          "d": "fresh Manila clams w/white wine, garlic & fresh herbs",
+          "p": "35"
+        },
+        {
+          "n": "Fettuccine con funghi",
+          "d": "porcini mushrooms",
+          "p": "35"
+        },
+        {
+          "n": "Pasta al pomodoro & basilico",
+          "d": "choice of any pasta on the menu",
+          "p": "21"
+        },
+        {
+          "n": "Farfalline with smoked salmon in a light vodka sauce",
+          "d": "",
+          "p": "31"
+        },
+        {
+          "n": "Rigatoni Norma",
+          "d": "with eggplant & ricotta salata",
+          "p": "33"
+        },
+        {
+          "n": "Cavatelli with Italian sausage & sun-dried tomato",
+          "d": "",
+          "p": "31"
+        },
+        {
+          "n": "Panzotti Porcini",
+          "d": "topped with truffle sauce",
+          "p": "35"
+        },
+        {
+          "n": "Tagliolini Chantrelle",
+          "d": "with fresh chantrelle mushrooms",
+          "p": "36"
+        },
+        {
+          "n": "Tagliolini Barolo",
+          "d": "with fresh morel mushrooms",
+          "p": "37"
+        },
+        {
+          "n": "Duck Ragu",
+          "d": "strozapreti pasta with duck ragu",
+          "p": "33"
+        },
+        {
+          "n": "Gnocchi Lobster",
+          "d": "with fresh grape tomato",
+          "p": "39"
+        }
+      ]
+    },
+    {
+      "s": "Pesce",
+      "items": [
+        {
+          "n": "Gamberoni (shrimp)",
+          "d": "in brandy cream sauce served w/fregula (pasta)",
+          "p": "35"
+        },
+        {
+          "n": "Grouper Gremolata",
+          "d": "with parsley, garlic & lemon zest",
+          "p": "36"
+        },
+        {
+          "n": "Salmon",
+          "d": "with mustard seed topping",
+          "p": "35"
+        },
+        {
+          "n": "Sea Scallops",
+          "d": "pan-seared with lemon sauce",
+          "p": "38"
+        }
+      ]
+    },
+    {
+      "s": "Carne",
+      "items": [
+        {
+          "n": "Fegato alla “Veneziana”",
+          "d": "calf liver w/ onions & white wine vinegar, w/ polenta",
+          "p": "30"
+        },
+        {
+          "n": "Scaloppine al limone",
+          "d": "veal with lemon & capers",
+          "p": "34"
+        },
+        {
+          "n": "Scaloppine con porcini",
+          "d": "veal with porcini mushrooms",
+          "p": "36"
+        },
+        {
+          "n": "Pork tenderloin",
+          "d": "with green apple, sage in a white wine sauce",
+          "p": "32"
+        },
+        {
+          "n": "Breast of Long Island duck with figs",
+          "d": "",
+          "p": "38"
+        },
+        {
+          "n": "Grilled Berkshire 1 ½ lb double pork chop",
+          "d": "35 minutes preparation time",
+          "p": "42"
+        },
+        {
+          "n": "Grilled Rib-eye 16 oz.",
+          "d": "also available sliced and/or with green peppercorn sauce",
+          "p": "60"
+        },
+        {
+          "n": "Veal Ossobuco",
+          "d": "",
+          "p": "65"
+        },
+        {
+          "n": "Cotechino",
+          "d": "Italian New Year’s ‘good luck’ dish – pork sausage with lentils",
+          "p": "30"
+        }
+      ]
+    },
+    {
+      "s": "Today's Desserts",
+      "items": [
+        {
+          "n": "Zabaione",
+          "d": "egg yolks whipped with sugar & marsala, served warm with mixed berries",
+          "p": "14"
+        },
+        {
+          "n": "Strudel di Miele",
+          "d": "classic strudel with green apple, raisins & pine nut filling",
+          "p": "12"
+        },
+        {
+          "n": "Millefoglie",
+          "d": "layers of flaky puff pastry filled with Italian Chantilly cream",
+          "p": "12"
+        },
+        {
+          "n": "Tirami su",
+          "d": "homemade mascarpone cream layered with lady fingers dipped in espresso",
+          "p": "12"
+        },
+        {
+          "n": "Crème Brulee",
+          "d": "classic custard with ‘burnt’ sugar top",
+          "p": "12"
+        },
+        {
+          "n": "Torta della Nonna",
+          "d": "tart filled with lemon pastry cream and topped with pine nuts and almonds",
+          "p": "12"
+        },
+        {
+          "n": "Chocolate Souffle",
+          "d": "warm chocolate souffle",
+          "p": "12"
+        },
+        {
+          "n": "Chocolate Mousse",
+          "d": "",
+          "p": "12"
+        },
+        {
+          "n": "Affogato",
+          "d": "espresso poured over gelato",
+          "p": "10"
+        },
+        {
+          "n": "Gelato",
+          "d": "Choice of: Chocolate, pistachio, Stracciatella, licorice, hazelnut, persimmon, or doppia creama with amarena cherries",
+          "p": "10"
+        },
+        {
+          "n": "Sbrisolona",
+          "d": "Italian almond or hazelnut “crumbled” cookies",
+          "p": "5"
+        }
+      ]
+    }
+  ],
+  "Topsoil Kitchen & Market": [
+    {
+      "s": "FOR THE TABLE",
+      "items": [
+        {
+          "n": "bread service",
+          "d": "house baked sourdough campagne, foraged ramp and honey butter, burnt garlic dust",
+          "p": "12.00"
+        },
+        {
+          "n": "cheese board",
+          "d": "three regional selections, accoutrements, sourdough campagne add charcuterie +10",
+          "p": "24.00"
+        },
+        {
+          "n": "Barbee Farms green garlic hummus (gfa, v)",
+          "d": "tahini, fennel pistou, crispy chickpea, crudité, sourdough campagne",
+          "p": "14.00"
+        },
+        {
+          "n": "house smoked fish dip (gfa)",
+          "d": "smoked king clip fish dip, salmon roe, tarragon, mustard, horseradish, crudité, house pickles, NY rye crackers",
+          "p": "15.00"
+        },
+        {
+          "n": "Noonday Farm chicken liver mousse",
+          "d": "luxardo cherry, Lusty Monk mustard, bacon jam, house pickles, black garlic brioche",
+          "p": "21.00"
+        },
+        {
+          "n": "crispy brussels, broccoli, Lady Moon Farm eggplant, and shiitake mushroom (gf, va)",
+          "d": "black bean char siu, nori-mushroom furikake, bonito",
+          "p": "18.00"
+        }
+      ]
+    },
+    {
+      "s": "SMALL PLATES",
+      "items": [
+        {
+          "n": "Cottle Organics beet and strawberry gazpacho (gf)",
+          "d": "foraged knotweed, yogurt, fennel frond, lime",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "roasted beet and Bush-N-Vine strawberry salad (gfa)",
+          "d": "watermelon radish, Monetta asparagus, herbed ricotta, pomegranate-rosé vinaigrette, watercress",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "Burgundy escargot “fried slice”",
+          "d": "maitake mushroom, fennel and Forx Farm gouda mornay, shallot, warm bacon vinaigrette, black garlic breadcrumb +8 add local morels",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "hamachi crudo (gf)",
+          "d": "smoked paprika vinaigrette, pickled cauliflower and rainbow carrot, marinated shallot",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "Plantation squab (gf)",
+          "d": "Bradford Farm beet and sunchoke red flannel hash, maple-banyuls and Bush-N-Vine strawberry gastrique",
+          "p": "Included in Prix Fixe"
+        }
+      ]
+    },
+    {
+      "s": "ENTREES",
+      "items": [
+        {
+          "n": "Market Fish (gf)",
+          "d": "gulf sheepshead, Clem’s Organic Gardens sunchoke and lemon vin blanc, cauliflower, English peas, Common Ground bok choy, bacon, caper, fennel gremolata, preserved lemon",
+          "p": "42.00 a la carte / Included in Prix Fixe"
+        },
+        {
+          "n": "braised Hickory Nut Gap beef cheek (gf)",
+          "d": "fresh peas in black truffle sauce, crispy Cottle Organics yukon potato, spring onion, horseradish vinaigrette",
+          "p": "46.00 a la carte / Included in Prix Fixe"
+        },
+        {
+          "n": "crispy Timberock Farm duck leg confit",
+          "d": "sorghum-soaked farro piccolo, asparagus, mixed Clem’s Organic Gardens radish, mustard and sorghum jus, wild greenbrier shoots",
+          "p": "42.00 a la carte / Included in Prix Fixe"
+        },
+        {
+          "n": "I See Fungi lion’s mane mushroom (gf, va)",
+          "d": "market vegetables, pine nut and black currant agrodolce, apple cider glaze, shaved gouda",
+          "p": "42.00 a la carte / Included in Prix Fixe"
+        },
+        {
+          "n": "hand rolled egg noodles",
+          "d": "braised Hickory Nut Gap pork cheek, kale, maitake mushroom ragout, fennel gremolata, pistachio and pesto, whipped ricotta",
+          "p": "42.00 a la carte / Included in Prix Fixe"
+        }
+      ]
+    },
+    {
+      "s": "DESSERTS",
+      "items": [
+        {
+          "n": "grapefruit mousse (gf)",
+          "d": "sauvignon gelee, orange segment, candied walnut",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "mocha crunch cake",
+          "d": "Leopard Forest coffee cream, single origin milk chocolate, caramelized ganache, hazelnut, cacao nib, hazelnut praline whip",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "composed cheese course",
+          "d": "Sweet Grass Dairy “Green Hill’ camembert, brioche toasted in anise sugar, macerated strawberry, pomegranate vinegar reduction, pine nut brittle",
+          "p": "Included in Prix Fixe"
+        },
+        {
+          "n": "Pine Knot Farms murasaki potato (va, gfa)",
+          "d": "coconut-sweet potato cake, coriander braised sweet potato pieces, rum pineapple, makrut leaf, coconut foam",
+          "p": "Included in Prix Fixe"
+        }
+      ]
+    }
+  ],
+  "Jianna": [
+    {
+      "s": "STARTERS",
+      "items": [
+        {
+          "n": "Prosciutto",
+          "d": "Di San Daniele, 24 Month, Dried Figs, Pecorino Romano",
+          "p": "20"
+        },
+        {
+          "n": "North Carolina Burrata",
+          "d": "Blackberries, Brown Butter Oat Crumb, Torn Mint, Charred Leek Vinaigrette",
+          "p": "15"
+        },
+        {
+          "n": "Ricotta Crostini",
+          "d": "Truffle Honey, Sea Salt, Grilled Ciabatta",
+          "p": "14"
+        },
+        {
+          "n": "Char-Grilled Octopus",
+          "d": "Potato, Guanciale, Pistachio, Sherry-lemon Vinaigrette",
+          "p": "16"
+        },
+        {
+          "n": "Baby Kale Salad",
+          "d": "Sour Cherries, Montasio Cheese, Pecans, Chardonnay Dressing",
+          "p": "14"
+        },
+        {
+          "n": "Potato Gnocchi",
+          "d": "Smoked Bacon, Tomato, Chive, Parmesan Brodo",
+          "p": "14"
+        },
+        {
+          "n": "Marinated Olives",
+          "d": "Lemon, Rosemary, Garlic, Chili",
+          "p": "8"
+        },
+        {
+          "n": "Short Rib Tortelli",
+          "d": "Pearl Onions, Pickled Fresno, Beech Mushrooms, Pecorino Romano",
+          "p": "15"
+        },
+        {
+          "n": "Spring Risotto",
+          "d": "English Peas, Lemon Zest, Torn Mint, Tuscan Olive Oil",
+          "p": "15"
+        },
+        {
+          "n": "Ricotta Gnudi",
+          "d": "Parmesan Cream, Parsley Oil, Fine Herbs, Parmesan Crisp",
+          "p": "15"
+        },
+        {
+          "n": "Grilled Ciabatta",
+          "d": "Sicilian Olive Oil, Chili Flake, Sea Salt",
+          "p": "4"
+        }
+      ]
+    },
+    {
+      "s": "RAW + CHILLED",
+      "items": [
+        {
+          "n": "Chilled Market Oysters*",
+          "d": "Jianna Cocktail and Hot Sauces, Moscato Mignonette (East Coast or West Coast)",
+          "p": "18/36"
+        },
+        {
+          "n": "Wagyu Beef Carpaccio*",
+          "d": "Watercress, Toasted Almonds, Blueberry Coulis, Pecorino Romano",
+          "p": "18"
+        },
+        {
+          "n": "Adriatic Osetra Caviar*",
+          "d": "Grilled Bread, Whipped Ricotta, Lemon, Chives (1 oz.)",
+          "p": "MKT"
+        }
+      ]
+    },
+    {
+      "s": "PASTA",
+      "items": [
+        {
+          "n": "Spaghetti TBG",
+          "d": "Garlic, Roast Tomatoes, Basil, Grana Padano",
+          "p": "24"
+        },
+        {
+          "n": "Gemelli",
+          "d": "Chicken Ragu, Sundried Tomato, Montasion Cheese, Chili Breadcrumbs",
+          "p": "28"
+        },
+        {
+          "n": "Fusilli al Nero de Sepia",
+          "d": "Florida Rock Shrimp, English Peas, Sicilian Pistachios, Pesto Genovese",
+          "p": "30"
+        },
+        {
+          "n": "Rigatoni",
+          "d": "Lamb Shank Ragu, Balsamic Pearl Onions, Pecorino Romano",
+          "p": "28"
+        }
+      ]
+    },
+    {
+      "s": "LARGE PLATES",
+      "items": [
+        {
+          "n": "Hangar Steak Steak Tagliata*",
+          "d": "Potato, Crimini Mushrooms, Kale, Salsa Verde",
+          "p": "38"
+        },
+        {
+          "n": "Alaskan Halibut*",
+          "d": "Fregula, Prosciutto, Asparagus, Herbs, Brodetto, Tomato Conserva",
+          "p": "40"
+        },
+        {
+          "n": "Sea Scallops*",
+          "d": "Baby Carrots, Asparagus, Fennel, Garlic Cream, Vincotto",
+          "p": "40"
+        },
+        {
+          "n": "Grilled Heritage Pork Chop*",
+          "d": "Colonial Mills Polenta, Maitake Mushroom, Roasted Tomato, Pomegranate Glaze",
+          "p": "36"
+        }
+      ]
+    },
+    {
+      "s": "ACCOMPANIMENTS",
+      "items": [
+        {
+          "n": "Baby Carrots",
+          "d": "Sicilian Pistachios, Ricotta Salata, Honey, Parsley",
+          "p": "8"
+        },
+        {
+          "n": "Meatballs",
+          "d": "Sugo, Breadcrumbs, Grana Padano",
+          "p": "8"
+        },
+        {
+          "n": "Brussels Sprouts",
+          "d": "Garlic Aioli, Toasted Pecans, Pecorino Romano",
+          "p": "8"
+        }
+      ]
+    },
+    {
+      "s": "DESSERT",
+      "items": [
+        {
+          "n": "Salted Caramel Semifreddo",
+          "d": "Almond Crumb, Shaved Chocolate, Caramel Sauce",
+          "p": "11"
+        },
+        {
+          "n": "Chocolate Torta Piedmontese",
+          "d": "Nutella Mousse, Espresso Gelato, Sanded Hazelnuts",
+          "p": "14"
+        },
+        {
+          "n": "Prosecco Cake",
+          "d": "Strawberry Sorbetto, Passionfruit Coulis, Baked Meringue",
+          "p": "12"
+        },
+        {
+          "n": "Blueberry Cannoli",
+          "d": "White Chocolate, Brown Butter Oat Crumb",
+          "p": "10"
+        },
+        {
+          "n": "House made Gelatos",
+          "d": "Daily Selections",
+          "p": "7"
+        },
+        {
+          "n": "Affogato",
+          "d": "Ricotta Gelato, Espresso",
+          "p": "8"
+        }
+      ]
+    }
+  ],
+  "DeMarco’s Italian": [
+    {
+      "s": "Starters / Antipasti",
+      "items": [
+        {
+          "n": "Octopus",
+          "d": "Rustic white bean puree, cherry tomato, celery, anchovy caper sauce",
+          "p": "21"
+        },
+        {
+          "n": "Wagyu Meatballs",
+          "d": "Beef, pork, guanciale, marinara, stracciatella, basil oil; Wagyu locally sourced from Durham Creek Ranch",
+          "p": "Not listed"
+        },
+        {
+          "n": "Arancini",
+          "d": "Three cheese rice balls, marinara, parsley",
+          "p": "Not listed"
+        },
+        {
+          "n": "Stuffed Long Hot Peppers",
+          "d": "House Italian sausage, fresh herbs, three cheese blend, marinara, breadcrumbs",
+          "p": "Not listed"
+        },
+        {
+          "n": "House-made Mozzarella",
+          "d": "Served with focaccia bread and prosciutto",
+          "p": "Not listed"
+        },
+        {
+          "n": "Roasted Beet Salad",
+          "d": "Whipped ricotta, pickled beets, beet chips",
+          "p": "Not listed"
+        },
+        {
+          "n": "Oysters",
+          "d": "Half dozen Gulf oysters with pancetta",
+          "p": "Not listed"
+        },
+        {
+          "n": "Cesar Salad",
+          "d": "Classic Caesar salad with house-made dressing",
+          "p": "Not listed"
+        }
+      ]
+    },
+    {
+      "s": "House-Made Pasta",
+      "items": [
+        {
+          "n": "Lasagna Verde",
+          "d": "Spinach pasta, broken meatball ragu, fontina, bechamel, parmigiano reggiano",
+          "p": "Not listed"
+        },
+        {
+          "n": "Duck Ragu",
+          "d": "Pappardelle pasta with foie gras butter, topped with breadcrumbs",
+          "p": "Not listed"
+        },
+        {
+          "n": "Tagliatelle with Truffles",
+          "d": "Razor-thin pasta with shaved truffles, whole butter, and Parmesan",
+          "p": "Not listed"
+        },
+        {
+          "n": "Rigatoni",
+          "d": "Basil, stracciatella, basil oil",
+          "p": "Not listed"
+        },
+        {
+          "n": "Garganelli",
+          "d": "Rock shrimp, tomato, fresno chili, crispy prosciutto, long hot",
+          "p": "Not listed"
+        },
+        {
+          "n": "Seafood Pasta #3",
+          "d": "Sea scallops, calamari, rock shrimp, bucatini, white wine-tomato brodo",
+          "p": "Not listed"
+        },
+        {
+          "n": "Spicy Vodka Pasta",
+          "d": "Pasta in a spicy vodka sauce",
+          "p": "Not listed"
+        },
+        {
+          "n": "3-Cheese Agnolotti",
+          "d": "Stuffed pasta with a blend of three cheeses",
+          "p": "Not listed"
+        }
+      ]
+    },
+    {
+      "s": "Wood-Fired Pizza",
+      "items": [
+        {
+          "n": "Pistachio Mortadella Pizza",
+          "d": "Pistachios, mortadella, hand-pulled mozzarella",
+          "p": "Not listed"
+        },
+        {
+          "n": "Mike & Pepe Pizza",
+          "d": "Meatballs, house-made mozzarella, tomato sauce",
+          "p": "Not listed"
+        },
+        {
+          "n": "Presada Hot Honey Pizza",
+          "d": "Pizza topped with spicy honey",
+          "p": "Not listed"
+        },
+        {
+          "n": "Vodka Supreme Pizza",
+          "d": "Pizza featuring vodka sauce and various toppings",
+          "p": "Not listed"
+        },
+        {
+          "n": "Russian Vodka Pizza",
+          "d": "A signature vodka-sauce based pizza",
+          "p": "Not listed"
+        }
+      ]
+    },
+    {
+      "s": "Mains / Entrees",
+      "items": [
+        {
+          "n": "Chicken \"Airline\" Cutlet",
+          "d": "Fried cutlet, cherry tomatoes, red onions, house-made mozzarella, aged balsamic",
+          "p": "Not listed"
+        },
+        {
+          "n": "Marsala",
+          "d": "Oyster & cremini mushrooms, shallots, parsley, whipped potatoes, chives",
+          "p": "Not listed"
+        },
+        {
+          "n": "Branzino",
+          "d": "Wood-fired whole fish",
+          "p": "Not listed"
+        },
+        {
+          "n": "Chicken Piccata",
+          "d": "Classic lemon and caper sauce",
+          "p": "Not listed"
+        },
+        {
+          "n": "Chicken Parmigiana",
+          "d": "Breaded chicken with marinara and mozzarella",
+          "p": "Not listed"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Blondie",
+          "d": "Mascarpone, Kahlua, lady fingers, crème anglaise, lemon curd",
+          "p": "Not listed"
+        },
+        {
+          "n": "Tiramisu",
+          "d": "Classic Italian coffee-flavored dessert",
+          "p": "Not listed"
+        },
+        {
+          "n": "Cannoli",
+          "d": "Crisp pastry shells with sweet ricotta filling",
+          "p": "Not listed"
+        },
+        {
+          "n": "Chocolate Cake",
+          "d": "Rich dark chocolate cake",
+          "p": "Not listed"
+        },
+        {
+          "n": "Panna Cotta",
+          "d": "Citrus compote, mascarpone cream",
+          "p": "Not listed"
+        }
+      ]
+    }
+  ],
+  "Coral": [
+    {
+      "s": "Appetizers",
+      "items": [
+        {
+          "n": "Bread with Ocean Butter",
+          "d": "House bread, whipped fumet butter, chives",
+          "p": "6"
+        },
+        {
+          "n": "Oysters on the Half Shell",
+          "d": "Fresh oysters served with lemon, mignonette, prepared horseradish, cocktail sauce, tabasco",
+          "p": "6/12 MKT"
+        },
+        {
+          "n": "Oysters Talador",
+          "d": "Oysters, chimichurri, cotija, prosciutto",
+          "p": "19"
+        },
+        {
+          "n": "Oyster Trio",
+          "d": "2 fried oysters, 2 oysters talador, 2 oysters on the half shell",
+          "p": "19"
+        },
+        {
+          "n": "Ceviche",
+          "d": "Halibut, shrimp, avocado, tomato, drop peppers, onion, mango, blue corn chips",
+          "p": "21"
+        },
+        {
+          "n": "Bangin’ Shrimp",
+          "d": "Tempura fried shrimp tossed in bangin’ sauce topped with scallions",
+          "p": "19"
+        },
+        {
+          "n": "Frenched Flat Wings",
+          "d": "Choice of: Korean BBQ or Buffalo Bacon",
+          "p": "16"
+        },
+        {
+          "n": "Tuna Carpaccio",
+          "d": "Daikon radish and carrot salad, cilantro, ponzu, jalapeno, peanuts, wasabi aioli",
+          "p": "19"
+        },
+        {
+          "n": "Charred Cauliflower (V)",
+          "d": "chimichurri, pistachio dust, pomegranate pearls",
+          "p": "17"
+        },
+        {
+          "n": "Beef Carpaccio",
+          "d": "Thinly sliced tenderloin, arugula, shaved parmesan, rosemary Dijon vinaigrette, capers, radish and house made pickles",
+          "p": "18"
+        },
+        {
+          "n": "NC Jumbo Lump Crab Cake",
+          "d": "Shaved fennel, arugula, red onion, pistachio dust, lemon beurre blanc",
+          "p": "MKT"
+        },
+        {
+          "n": "Scallop Croquettes",
+          "d": "Scallop and potato croquettes, slow roasted tomato jam, remoulade",
+          "p": "16"
+        },
+        {
+          "n": "Shrimp Cocktail",
+          "d": "Jumbo shrimp served with homemade cocktail sauce",
+          "p": "18"
+        },
+        {
+          "n": "Calamari Fries",
+          "d": "Calamari steak sliced, breaded, and fried, served with spicy ketchup & lemon",
+          "p": "17"
+        },
+        {
+          "n": "Caviar",
+          "d": "Chopped egg yolks, diced red onion, chives, creme fraiche, house chips or blinis",
+          "p": "MKT"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Arugula Salad",
+          "d": "Blueberries, strawberries, oranges, golden raisins, candied pecans, goat cheese, rosemary Dijon vinaigrette",
+          "p": "14"
+        },
+        {
+          "n": "Wedge",
+          "d": "Baby iceberg, bacon lardons, tomatoes, gorgonzola, sliced boiled egg, crispy fried onions, chives",
+          "p": "13"
+        },
+        {
+          "n": "Grilled Caesar Salad",
+          "d": "Charred romaine lettuce, grated parmesan, Caesar dressing, croutons, tomatoes, lemon",
+          "p": "11"
+        },
+        {
+          "n": "Burrata",
+          "d": "Grilled peaches, endive, pistachios, arugula, rosemary Dijon vinaigrette, prosciutto",
+          "p": "16"
+        }
+      ]
+    },
+    {
+      "s": "Sea",
+      "items": [
+        {
+          "n": "Sea Scallops",
+          "d": "Seared scallops, parmesan risotto, blistered tomatoes, lemon beurre blanc, microgreens",
+          "p": "44"
+        },
+        {
+          "n": "Salmon",
+          "d": "Blackened salmon, asparagus, pickled shallots, peas, bacon lardons, poblano and cauliflower cream",
+          "p": "36"
+        },
+        {
+          "n": "Halibut",
+          "d": "Blackened halibut, peach chutney, broccoli salad with shaved almond, golden raisins, radish",
+          "p": "43"
+        },
+        {
+          "n": "Swordfish",
+          "d": "Grilled swordfish, braised marble potatoes, tomatoes, broccolini, lemon dill aioli, ocean butter",
+          "p": "38"
+        },
+        {
+          "n": "Chilean Sea Bass",
+          "d": "Soy glazed Chilean Sea Bass, sautéed baby bok choy and red peppers, basmati rice, miso butter sauce, fried sweet potato ribbons",
+          "p": "54"
+        },
+        {
+          "n": "Tuna",
+          "d": "Center cut yuzu teriyaki glazed Ahi tuna, carrots, red cabbage, snow peas, sticky forbidden rice, yum yum, cashews",
+          "p": "41"
+        }
+      ]
+    },
+    {
+      "s": "Land",
+      "items": [
+        {
+          "n": "Chicken Piccata",
+          "d": "Flour dredged pan seared chicken cutlet in caper lemon pan sauce, spinach, tomatoes, red onion & linguine",
+          "p": "32"
+        },
+        {
+          "n": "Rack of Lamb",
+          "d": "Roasted coffee rubbed lamb rack, arugula, candied carrots, chermoula emulsion, parsnip mascarpone puree",
+          "p": "Two Chops $41 / Three Chops $56"
+        },
+        {
+          "n": "Braised Short Rib",
+          "d": "Garlic confit whipped potatoes, asparagus, carrots, pomegranate demi",
+          "p": "41"
+        },
+        {
+          "n": "Filet",
+          "d": "Herb compound butter, asparagus, garlic confit whipped potatoes",
+          "p": "57"
+        },
+        {
+          "n": "Coral Curry (V)",
+          "d": "Caribbean style curry with broccolini, marble potatoes, chick peas, red bell peppers, mango, green onion, rice, toasted coconut, lime wedge",
+          "p": "22"
+        }
+      ]
+    },
+    {
+      "s": "Bar Menu",
+      "items": [
+        {
+          "n": "Duckfat Fries",
+          "d": "Fries tossed in duck fat, served with garlic confit aioli, ketchup",
+          "p": "6"
+        },
+        {
+          "n": "Blackened Mahi Mahi Sandwich",
+          "d": "Shaved romaine, pickles, and lemon aioli",
+          "p": "20"
+        },
+        {
+          "n": "Calamari Fries",
+          "d": "Calamari steak sliced, breaded, and fried, served with spicy ketchup & lemon",
+          "p": "17"
+        },
+        {
+          "n": "Coral Crush Burger",
+          "d": "Two 3oz. smashed burger patties, American cheese, garlic confit aioli & diced caramelized onions.",
+          "p": "17"
+        },
+        {
+          "n": "Fish N’ Chips",
+          "d": "Buttermilk fried cod, duck fat fries, lemon dill aioli",
+          "p": "21"
+        },
+        {
+          "n": "Lobster Roll",
+          "d": "Lobster tossed in capers, celery, and lemon aioli",
+          "p": "28"
+        },
+        {
+          "n": "Bangin’ Shrimp",
+          "d": "Tempura fried shrimp tossed in bangin’ sauce topped with scallions",
+          "p": "19"
+        },
+        {
+          "n": "Frenched Flat Wings",
+          "d": "Choice of: Korean BBQ or Buffalo Bacon",
+          "p": "16"
+        }
+      ]
+    },
+    {
+      "s": "Dessert",
+      "items": [
+        {
+          "n": "Creme Brulee",
+          "d": "Vanilla bean custard",
+          "p": "10"
+        },
+        {
+          "n": "Chocolate Peanut Butter Mousse Bar",
+          "d": "Peanut butter and chocolate mousse, dark chocolate brownie, peanut butter praline, whipped cream, Reese's Pieces",
+          "p": "12"
+        },
+        {
+          "n": "Biscoff Basque Cheesecake",
+          "d": "Cookie butter crumble crust, Biscoff cheesecake, whipped Chantilly",
+          "p": "12"
+        },
+        {
+          "n": "Sticky Toffee Pudding",
+          "d": "Traditional sticky date pudding, caramel toffee sauce, vanilla bean ice cream",
+          "p": "13"
+        },
+        {
+          "n": "Belgian Waffle Cake",
+          "d": "Maple syrup, butter, flake salt, vanilla bean ice cream",
+          "p": "13"
+        }
+      ]
+    }
+  ],
+  "City Tavern": [
+    {
+      "s": "Appetizers",
+      "items": [
+        {
+          "n": "Boardwalk Boiled Peanuts",
+          "d": "Cajun Seasoned Boiled Peanuts.",
+          "p": "5.00"
+        },
+        {
+          "n": "Buffalo Chicken Dip",
+          "d": "Shredded slow roasted chicken in zesty buffalo sauce, blended with Monterey Jack & cream cheese for a bold, creamy flavor. Served with hand-cut crunchy Tavern Chips.",
+          "p": "13.45"
+        },
+        {
+          "n": "Ham Delights",
+          "d": "Kings Hawaiian Pull Aparts, Ham, American Cheese, Mayo, Honey Mustard, Brown Sugar Maple Butter & Poppy Seeds.",
+          "p": "12.95"
+        },
+        {
+          "n": "Chicken Bog Bites",
+          "d": "Chicken, Smoked Sausage, and Rice slow cooked in a rich, seasoned broth, balled and fried to crispy golden perfection. Side of house-made City Sauce. *Arguably the most South Carolina dish there is.",
+          "p": "13.95"
+        },
+        {
+          "n": "Kansas City Nachos",
+          "d": "Crunchy Tavern Chips loaded with Mac 'N Cheese, Slow Roasted Pork, Hot Honey BBQ and Fresh Jalapeños.",
+          "p": "14.95"
+        },
+        {
+          "n": "Deep South Deviled Eggs",
+          "d": "Six Deviled Eggs, Cornbread Crumble, Bacon, Pickled Onion Relish, & Jalapeño Pimento Cheese.",
+          "p": "10.95"
+        },
+        {
+          "n": "Fried Mushrooms",
+          "d": "Crispy Fried Mushrooms. Side of house-made City Sauce.",
+          "p": "10.95"
+        },
+        {
+          "n": "Mozzarella Sticks",
+          "d": "Fried Mozzarella Sticks with house-made Vodka Sauce.",
+          "p": "11.95"
+        },
+        {
+          "n": "Chicharrones",
+          "d": "Cajun Chili Rubbed Pork Skins served with Guacamole.",
+          "p": "7.95"
+        }
+      ]
+    },
+    {
+      "s": "Wings",
+      "items": [
+        {
+          "n": "Traditional Bone-In",
+          "d": "One pound of traditional bone-in wings tossed in your choice of sauce or dry rub. Served with Celery and a side of Ranch or Bleu Cheese Dressing.",
+          "p": "16.45"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Chicken Caesar Salad",
+          "d": "Grilled Chicken, Chopped Romaine, Shaved Parm, Crunchy Garlic Croutons, Creamy Caesar Dressing.",
+          "p": "14.95"
+        },
+        {
+          "n": "Chicken Cobb Salad",
+          "d": "Grilled Chicken, Chopped Romaine, Crispy Bacon, Onions, Tomatoes, Bleu Cheese Crumbles, Hard Boiled Egg, Ranch.",
+          "p": "15.95"
+        },
+        {
+          "n": "Citrus Salmon Salad",
+          "d": "Wild Caught Salmon, Crisp Romaine, House Citrus Dressing, Mandarin Oranges, Cucumbers, Tomatoes, Red Onion, Pistachios, and Shaved Parmesan.",
+          "p": "16.95"
+        }
+      ]
+    },
+    {
+      "s": "Mains & Sandwiches",
+      "items": [
+        {
+          "n": "Chicken Tenders",
+          "d": "Jumbo Crispy Chicken Tenders. Served with a side of Tavern Chips.",
+          "p": "14.65"
+        },
+        {
+          "n": "Cajun Philly Cheese",
+          "d": "Shaved U.S. Beef, American Cheese, Fried Onion Rings, Spicy Cajun Ranch on a toasted Hoagie. Served with a side of Tavern Chips.",
+          "p": "14.45"
+        },
+        {
+          "n": "Vodka Chicken Parm",
+          "d": "Crispy Chicken Fingers, House Vodka Sauce, Shredded Mozzarella on a toasted Hoagie. Served with a side of Tavern Chips.",
+          "p": "14.45"
+        },
+        {
+          "n": "Tavern Burger",
+          "d": "Flame Broiled Patty, Yellow American, Lettuce, Tomato, Onion, and Mayo on a Sesame Seed Bun. Served with a side of Tavern Chips.",
+          "p": "14.45"
+        },
+        {
+          "n": "Patty Melt",
+          "d": "Smash Patty, Grilled Onions, Yellow American, and City Sauce. Served with a side of Tavern Chips.",
+          "p": "14.45"
+        },
+        {
+          "n": "Big Boy BLT",
+          "d": "Bacon, Lettuce, Tomato, Guacamole, Fried Egg, and Mayo. Served with a side of Tavern Chips.",
+          "p": "12.95"
+        },
+        {
+          "n": "Chicken Club",
+          "d": "Grilled Chicken, Crispy Bacon, Lettuce, Tomato, Guacamole, Fried Egg, and Mayo. Served with a side of Tavern Chips.",
+          "p": "14.95"
+        },
+        {
+          "n": "The Lord's Chicken",
+          "d": "Crispy Fried Chicken and Sliced Pickles on a Sesame Seed Bun. Served with a side of Tavern Chips.",
+          "p": "13.95"
+        },
+        {
+          "n": "Chicken Caesar Wrap",
+          "d": "Fried Chicken Tenders, Crisp Romaine, Creamy Caesar, Shaved Parmesan, and Croutons. Served with a side of Tavern Chips.",
+          "p": "13.95"
+        },
+        {
+          "n": "Buffalo Chicken Wrap",
+          "d": "Crispy Buffalo Chicken Tenders, Crisp Romaine, Monterey Jack, Bleu Cheese Crumbles, and Ranch. Served with a side of Tavern Chips.",
+          "p": "13.95"
+        }
+      ]
+    },
+    {
+      "s": "Quesadillas",
+      "items": [
+        {
+          "n": "Chicken Bacon Ranch Quesadilla",
+          "d": "Grilled Chicken, Crispy Bacon, Melty Cheese, Zesty Ranch. Side of Ranch and house-made Pico.",
+          "p": "14.45"
+        },
+        {
+          "n": "Chipotle Chicken Quesadilla",
+          "d": "Grilled Chicken, Chipotle Sauce, Melty Cheese, Roasted Corn, Green Chiles, Tomatoes. Side Sour Cream and house-made Pico.",
+          "p": "14.45"
+        },
+        {
+          "n": "Veggie Quesadilla",
+          "d": "Sautéed Mushrooms, Onions, Roasted Corn, Tomatoes, Melty Cheese. *Spice it up with Pickled Jalapeños. Side Sour Cream and house-made Pico.",
+          "p": "12.45"
+        },
+        {
+          "n": "Steak & Chimi Quesadilla",
+          "d": "Marinated Skirt Steak, Melty Cheese, Guacamole, Chimichurri. Side Sour Cream and house-made Pico.",
+          "p": "14.45"
+        }
+      ]
+    },
+    {
+      "s": "Premium Sides",
+      "items": [
+        {
+          "n": "French Fries",
+          "d": "",
+          "p": "+3.00"
+        },
+        {
+          "n": "Mac 'N Cheese",
+          "d": "",
+          "p": "+4.00"
+        },
+        {
+          "n": "Caesar Salad",
+          "d": "",
+          "p": "+3.00"
+        },
+        {
+          "n": "Broccolini",
+          "d": "",
+          "p": "+4.00"
+        }
+      ]
+    }
+  ],
+  "Blues Bar": [
+    {
+      "s": "Appetizers",
+      "items": [
+        {
+          "n": "Wings",
+          "d": "7 pieces of all-white meat chicken cooked to a golden-crisp and dipped in a freshly made spicy honey BBQ sauce.",
+          "p": "11.00"
+        },
+        {
+          "n": "Fruit & Cheese",
+          "d": "A savory assortment of seasonal farm fresh fruits, cheese, and gourmet crackers.",
+          "p": "9.00"
+        },
+        {
+          "n": "Spring Rolls",
+          "d": "Three crispy spring rolls stuffed with chicken and vegetables, served over mixed greens with a sweet Thai chili sauce.",
+          "p": "6.00"
+        },
+        {
+          "n": "Chip & Salsa",
+          "d": "Fresh tortilla chips served with spicy mango salsa.",
+          "p": "5.00"
+        },
+        {
+          "n": "Buffalo Chicken Flatbread",
+          "d": "Fresh flatbread topped with a spicy buffalo sauce, all-white meat chicken, mozzarella, and blue cheese crumbles.",
+          "p": "9.00"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Berry Spinach Salad",
+          "d": "Fresh sliced strawberries, goat cheese, and crumbled bacon over a bed of fresh baby spinach, served with honey balsamic vinaigrette.",
+          "p": "10.00"
+        },
+        {
+          "n": "Jazzy House Salad",
+          "d": "Sweet dried cranberries, blue cheese crumbles, and candied nuts over a bed of mixed greens, served with light Italian dressing.",
+          "p": "10.00"
+        },
+        {
+          "n": "Caesar Salad",
+          "d": "Romaine lettuce topped with parmesan cheese, seasoned croutons, and traditional caesar dressing.",
+          "p": "9.00"
+        },
+        {
+          "n": "Add Grilled Chicken",
+          "d": "Protein addition for any salad.",
+          "p": "4.00"
+        }
+      ]
+    },
+    {
+      "s": "Entrees",
+      "items": [
+        {
+          "n": "Jambalaya",
+          "d": "Made fresh with chicken, smoked sausage, green peppers, and onions sautéed and stewed in a spicy Cajun tomato sauce, served over a bed of white rice.",
+          "p": "10.00"
+        },
+        {
+          "n": "Chicken Fajita Kabobs",
+          "d": "Three skewers of chicken fajita served over a bed of Spanish rice.",
+          "p": "12.00"
+        },
+        {
+          "n": "Shrimp and Grits",
+          "d": "Mildly-spicy shrimp on a bed of sautéed cabbage, served over fresh cheddar cheese grits.",
+          "p": "15.00"
+        },
+        {
+          "n": "Bacon, Black, and Blue Burger",
+          "d": "All-beef burger topped with bacon and blue cheese crumbles, served with golden crisp fries.",
+          "p": "12.00"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Rotating Dessert Selection",
+          "d": "Ask about the daily selection.",
+          "p": "8.00"
+        }
+      ]
+    }
+  ],
+  "The Matador": [
+    {
+      "s": "Seasonal Features",
+      "items": [
+        {
+          "n": "Ceviche con Aguachile",
+          "d": "Shrimp & scallop, heart of palm, avocado, serrano salsa verde, cucumber, fresh citrus [gf]",
+          "p": "17"
+        },
+        {
+          "n": "Potato & Chorizo Taquitos",
+          "d": "Fried crispy corn tortillas, house-made chorizo, gold potatoes, chipotle crema, house ranch, serrano slaw [gf]",
+          "p": "12"
+        },
+        {
+          "n": "Grilled Fish Tacos",
+          "d": "Charbroiled mahi mahi, serrano slaw, chipotle crema, guacamole, dragonfruit salsa. Served on corn tortillas with Mexican rice and black beans [gf]",
+          "p": "22"
+        },
+        {
+          "n": "Wagyu Sirloin",
+          "d": "8oz American Wagyu top sirloin, roasted garlic mashed potatoes, grilled broccolini, chipotle breadcrumbs. Mashed potatoes only available after 4PM.",
+          "p": "38"
+        }
+      ]
+    },
+    {
+      "s": "Starters & Snacks",
+      "items": [
+        {
+          "n": "Dip Flight",
+          "d": "Creamy three cheese queso, fresh guacamole, hearty black bean dip [gf]",
+          "p": "15"
+        },
+        {
+          "n": "Matador Guacamole",
+          "d": "Orange-habanero salsa Maya, tomatillo salsa, pico, queso fresco, cilantro [gf]",
+          "p": "11"
+        },
+        {
+          "n": "Black Bean Dip",
+          "d": "Black beans, habanero, garlic crema, tomatillo salsa, green onion [gf/v]",
+          "p": "9.5"
+        },
+        {
+          "n": "Queso Con Chorizo",
+          "d": "Melted three-cheese house blend, creamy habanero sauce, pico de gallo, cilantro, queso fresco [gf]",
+          "p": "11"
+        },
+        {
+          "n": "Crispy Brussels Sprouts",
+          "d": "Fried brussels sprouts, peppers & onions, lime, agave, cotija [gf/v]",
+          "p": "11"
+        },
+        {
+          "n": "Fried Tacos",
+          "d": "Crispy fried corn tortillas, shredded chicken, black bean queso, shredded lettuce, pico de gallo, serrano vinaigrette, salsa Maya, chimichurri mayo",
+          "p": "9.5"
+        },
+        {
+          "n": "Street Tacos",
+          "d": "White onion, cilantro, cotija, house-made salsa, radish, and lime on corn tortillas [gf]. Choices: Carnitas, Chorizo, Beyond Picadillo, Ground Beef, or Shredded Chicken.",
+          "p": "3 for $10, 5 for $15.5"
+        },
+        {
+          "n": "Grilled Stuffed Jalapeños",
+          "d": "Goat Cheese, smoked bacon, ranch dressing [gf]",
+          "p": "13.5"
+        },
+        {
+          "n": "Quesabirria",
+          "d": "Three corn tortillas filled with Jack cheese, roasted poblanos, beef birria, onions, birria jus [gf]",
+          "p": "15"
+        },
+        {
+          "n": "Haba Prawns",
+          "d": "Fiery roasted habanero sauce, roasted garlic & jalapeño polenta, hibiscus pickled onion [gf]",
+          "p": "14"
+        },
+        {
+          "n": "Crispy Coconut Shrimp",
+          "d": "Shredded coconut, chile-flour batter, pickled jalapeño and Fresno chiles, salsa verde, chipotle ranch",
+          "p": "13.5"
+        },
+        {
+          "n": "Grande Nachos",
+          "d": "Cheddar, Monterey Jack, black beans, pico de gallo, guacamole, cilantro-lime sour cream [gf]",
+          "p": "12.5"
+        },
+        {
+          "n": "Matador Quesadilla",
+          "d": "Monterey Jack, guacamole, garlic crema, toasted pepitas, pico de gallo, cilantro-lime sour cream",
+          "p": "10.5 - $13.5"
+        },
+        {
+          "n": "Ahi Tuna Tostadas",
+          "d": "Agave ponzu sauce, avocado, chipotle mayo, green onion, finishing salt [gf]",
+          "p": "14"
+        }
+      ]
+    },
+    {
+      "s": "Soups & Salads",
+      "items": [
+        {
+          "n": "Tortilla Chicken Soup",
+          "d": "Roasted chicken, fire-roasted corn, avocado, tortilla strips, cotija, cilantro [gf]",
+          "p": "5.5 (cup) / $9.5 (bowl)"
+        },
+        {
+          "n": "Romaine Salad",
+          "d": "Cilantro pepita dressing, toasted pepitas, pico de gallo, cotija, lime [gf/v]",
+          "p": "8.5"
+        },
+        {
+          "n": "Chop Salad",
+          "d": "Fire-roasted corn, red bell pepper, Mexican black beans, pico de gallo, romaine lettuce, green and red cabbages, fried tortilla strips, chipotle ranch",
+          "p": "17"
+        },
+        {
+          "n": "Taco Salad",
+          "d": "Black beans, Monterey Jack, cotija, shredded lettuce, guacamole, pico de gallo, cilantro-lime sour cream, serrano vinaigrette, garlic crema, jalapeños en escabeche",
+          "p": "14.5 - $19"
+        }
+      ]
+    },
+    {
+      "s": "Sandwiches & Bowls",
+      "items": [
+        {
+          "n": "Carne Asada Sandwich",
+          "d": "Grilled marinated steak, French fried onions, serrano slaw, roasted poblano, pico de gallo, chimichurri mayo. Served with fries.",
+          "p": "18.5"
+        },
+        {
+          "n": "Wagyu Bacon Cheeseburger",
+          "d": "Mixed greens, pico de gallo, bacon, French fried onions, Jack & cheddar cheeses, chipotle mayo. Served with fries.",
+          "p": "17"
+        },
+        {
+          "n": "Agave Chicken Wrap",
+          "d": "Agave-marinated chicken breast, bacon, avocado, cilantro-pepita dressing, pico de gallo, shredded lettuce, serrano vinaigrette, cotija. Served with fries.",
+          "p": "16"
+        },
+        {
+          "n": "Matador Bowl",
+          "d": "Mexican black beans & rice, cheese blend, serrano slaw, crema, pico de gallo, guacamole, radish, tortilla strips. Choice of sauce.",
+          "p": "16.5 - $17.5"
+        },
+        {
+          "n": "Gaucho Bowl",
+          "d": "Sautéed peppers & onions, Mexican black beans & rice, Jack & cheddar cheeses, shredded lettuce, pico de gallo, guacamole, cilantro-lime sour cream, French fried onions",
+          "p": "19.5 - $20.5"
+        }
+      ]
+    },
+    {
+      "s": "Specialty Tacos",
+      "items": [
+        {
+          "n": "Baja Fish Tacos",
+          "d": "Panko crusted and fried Mahi Mahi, serrano slaw, guacamole, chipotle mayo, radish, cilantro, lime. Two tacos served with rice and beans.",
+          "p": "20"
+        },
+        {
+          "n": "Coconut Shrimp Tacos",
+          "d": "Crispy coconut-breaded shrimp, mango-pineapple salsa, pico, cilantro-lime sour cream, serrano slaw. Two tacos served with rice and beans.",
+          "p": "19"
+        },
+        {
+          "n": "Mango Steak Tacos",
+          "d": "Grilled carne asada, mango-pineapple salsa, serrano slaw, guajillo-chile sauce, Tajin. Two tacos served with rice and beans.",
+          "p": "21"
+        },
+        {
+          "n": "Ribeye Tacos",
+          "d": "Grilled ribeye, French fried onions, chimichurri mayo, avocado, grilled red pepper, cotija. Two tacos served with rice and beans.",
+          "p": "21.5"
+        }
+      ]
+    },
+    {
+      "s": "Standard Tacos",
+      "items": [
+        {
+          "n": "Marinated Carne Asada",
+          "d": "Two tacos topped with shredded lettuce, guajillo chile sauce, pico de gallo, garlic crema. Served with rice and beans.",
+          "p": "18.5"
+        },
+        {
+          "n": "Shredded Chicken Thigh",
+          "d": "Two tacos topped with shredded lettuce, guajillo chile sauce, pico de gallo, garlic crema. Served with rice and beans.",
+          "p": "16"
+        },
+        {
+          "n": "Beyond Picadillo",
+          "d": "Two tacos topped with shredded lettuce, guajillo chile sauce, pico de gallo, garlic crema. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Braised Pork Carnitas",
+          "d": "Two tacos topped with serrano slaw, tomatillo salsa, pico de gallo, garlic crema, cotija cheese. Served with rice and beans.",
+          "p": "16"
+        },
+        {
+          "n": "Chile Sautéed Shrimp",
+          "d": "Two tacos topped with serrano slaw, tomatillo salsa, pico de gallo, garlic crema, cotija cheese. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Grilled Chicken Breast",
+          "d": "Two tacos topped with serrano slaw, tomatillo salsa, pico de gallo, garlic crema, cotija cheese. Served with rice and beans.",
+          "p": "16.5"
+        }
+      ]
+    },
+    {
+      "s": "Enchiladas",
+      "items": [
+        {
+          "n": "Divorciadas",
+          "d": "Mild sweet and tangy salsa verde, medium smokey salsa roja, slow braised chicken thighs, corn tortillas. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Habanero",
+          "d": "Fiery hot habanero salsa, shredded chicken, flour tortillas. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Shredded Beef",
+          "d": "Medium and smoky salsa roja, flour tortillas, shredded braised beef birria. Served with rice and beans.",
+          "p": "18.5"
+        },
+        {
+          "n": "Verde Carnitas",
+          "d": "Medium sweet and tangy salsa verde, braised carnitas, corn tortillas. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Poblano Carnitas",
+          "d": "Braised carnitas, rich and mild crema salsa. Served with rice and beans.",
+          "p": "17.5"
+        },
+        {
+          "n": "Habanero Steak",
+          "d": "Grilled marinated steak, picante habanero sauce. Served with rice and beans.",
+          "p": "20.5"
+        },
+        {
+          "n": "Verde Chicken",
+          "d": "Braised chicken, chile verde sauce. Served with rice and beans.",
+          "p": "17.5"
+        }
+      ]
+    },
+    {
+      "s": "Burritos",
+      "items": [
+        {
+          "n": "Beyond Burrito",
+          "d": "Plant-based protein, medium and smokey salsa roja, caramelized onions, roasted poblanos. Served with rice and beans.",
+          "p": "19"
+        }
+      ]
+    },
+    {
+      "s": "Entrées",
+      "items": [
+        {
+          "n": "Braised Carnitas",
+          "d": "Pork shoulder, guacamole, cilantro-lime sour cream, pico de gallo, pickled onions, salsa maya, Mexican black beans & rice. Choice of tortillas.",
+          "p": "21"
+        },
+        {
+          "n": "Skillet Seared Fajitas",
+          "d": "Mexican black beans, Jack & cheddar cheeses, romaine, pico de gallo, guacamole, cilantro-lime sour cream, flour or corn tortillas.",
+          "p": "25.5 - $30.5"
+        },
+        {
+          "n": "Shrimp & Chorizo Paella",
+          "d": "Shrimp, house chorizo, sautéed fajita peppers, achiote-chile rice, saffron cream [gf]",
+          "p": "22"
+        },
+        {
+          "n": "Grilled Carne Asada",
+          "d": "Street corn and leeks, grilled peppers, cotija, cilantro, achiote-chile rice, Mexican black beans. Skirt Steak or Ribeye.",
+          "p": "29 - $30"
+        },
+        {
+          "n": "Mango-Pineapple Mahi Mahi",
+          "d": "Chunky mango & pineapple salsa, fruity salsa verde, serrano slaw, chile-achiote rice, cilantro, lime",
+          "p": "22.5"
+        },
+        {
+          "n": "Roasted Chile Rellenos",
+          "d": "Poblanos stuffed with Mexican rice, Monterey Jack cheese, tomatillo salsa, served with Mexican black beans, poblano crema, garlic crema, pico de gallo, and tortilla strips.",
+          "p": "22"
+        }
+      ]
+    },
+    {
+      "s": "Dessert",
+      "items": [
+        {
+          "n": "Salted Caramel Brownie",
+          "d": "Bittersweet chocolate, salted dulce de leche, strawberry compote, vanilla ice cream",
+          "p": "8"
+        },
+        {
+          "n": "Fried Ice Cream",
+          "d": "Toasted coconut, whipped cream, reposado dulce de leche, cinnamon [gf]",
+          "p": "8"
+        }
+      ]
+    }
+  ],
+  "BrickTop’s": [
+    {
+      "s": "PRIME SUSHI",
+      "items": [
+        {
+          "n": "Butter Crab",
+          "d": "warm crab, soy paper, ponzu butter",
+          "p": "22"
+        },
+        {
+          "n": "Hollywood",
+          "d": "crab meat, tempura shrimp, asparagus, avocado",
+          "p": "22"
+        },
+        {
+          "n": "Dragon",
+          "d": "tempura shrimp, cream cheese, asparagus, avocado",
+          "p": "22"
+        },
+        {
+          "n": "Yum Yum",
+          "d": "tempura shrimp, crab, asparagus, topped with filet mignon & yum yum sauce",
+          "p": "22"
+        },
+        {
+          "n": "Crazy Tuna",
+          "d": "seared tuna, jicama, avocado, topped with spicy tuna",
+          "p": "20"
+        },
+        {
+          "n": "Firecracker",
+          "d": "spicy tuna**, lump crab, avocado, spicy mayo, jalapeno",
+          "p": "22"
+        },
+        {
+          "n": "Shangri La",
+          "d": "California roll topped with tuna, shrimp, salmon, and avocado",
+          "p": "20"
+        }
+      ]
+    },
+    {
+      "s": "APPETIZERS & SALADS",
+      "items": [
+        {
+          "n": "Deviled Eggs & Sugar Bacon",
+          "d": "None listed",
+          "p": "14"
+        },
+        {
+          "n": "Grilled California Artichokes",
+          "d": "simply grilled, aioli",
+          "p": "14"
+        },
+        {
+          "n": "Shanghai Shrimp",
+          "d": "lightly battered jumbo shrimp tossed in sweet & spicy sauce, served with ponzu",
+          "p": "(6) 14"
+        },
+        {
+          "n": "Spinach & Artichoke Dip",
+          "d": "served with salsa and warm tortilla chips",
+          "p": "14"
+        },
+        {
+          "n": "Caesar*",
+          "d": "grated parmesan, toasted ciabatta croutons",
+          "p": "14"
+        },
+        {
+          "n": "Little Gem",
+          "d": "grated feta, diced tomato and cucumber, red onion, egg, green goddess dressing",
+          "p": "14"
+        },
+        {
+          "n": "The Wedge",
+          "d": "iceberg lettuce, chopped bacon, cucumber, egg blue cheese or thousand island",
+          "p": "14"
+        },
+        {
+          "n": "Lobster Bisque",
+          "d": "fresh Maine lobster, sherry",
+          "p": "14"
+        },
+        {
+          "n": "Crispy Calamari",
+          "d": "garlic aioli & marinara sauce",
+          "p": "16"
+        },
+        {
+          "n": "Tuna Tartare*",
+          "d": "avocado, mango, pine nuts**, crispy wontons",
+          "p": "16"
+        },
+        {
+          "n": "Greek Salad",
+          "d": "chickpeas, tomato, cucumber, red pepper, feta",
+          "p": "14"
+        }
+      ]
+    },
+    {
+      "s": "SEAFOOD",
+      "items": [
+        {
+          "n": "Grilled Trout",
+          "d": "champagne beurre blanc, capers (add lump crab meat - 10), served with sautéed spinach",
+          "p": "32"
+        },
+        {
+          "n": "Atlantic Salmon*",
+          "d": "pan-roasted served with broccoli",
+          "p": "32"
+        },
+        {
+          "n": "Crab Cakes",
+          "d": "jumbo lump crab, rémoulade sauce served with French fries",
+          "p": "38"
+        },
+        {
+          "n": "Ahi Tuna Steak*",
+          "d": "sesame crusted, seared rare, sliced served with stir-fried vegetables",
+          "p": "36"
+        },
+        {
+          "n": "Cedarwood Planked Salmon*",
+          "d": "seasoned with shallots, fresh herbs, lemon juice served with sautéed spinach",
+          "p": "32"
+        }
+      ]
+    },
+    {
+      "s": "ENTRÉES",
+      "items": [
+        {
+          "n": "Bistro Chicken",
+          "d": "thinly sliced chicken breast, pan sautéed, beurre blanc served with creamy whipped potatoes",
+          "p": "30"
+        },
+        {
+          "n": "Cheeseburger Deluxe*",
+          "d": "fully dressed, sharp cheddar (sunny side up egg 2), served with French fries or cole slaw",
+          "p": "None listed"
+        },
+        {
+          "n": "Palm Beach Salad*",
+          "d": "perfectly stacked crab meat, poached shrimp, rémoulade, avocado, diced tomato, chopped egg",
+          "p": "28"
+        },
+        {
+          "n": "Deluxe BBQ Ribs",
+          "d": "served with cole slaw and French fries",
+          "p": "32"
+        },
+        {
+          "n": "Tavern Burger",
+          "d": "two griddled patties, caramelized onion, American cheese, secret sauce, served with French fries or cole slaw",
+          "p": "22"
+        },
+        {
+          "n": "Prime Meatloaf",
+          "d": "prime sirloin, glazed served with creamy whipped potatoes",
+          "p": "30"
+        },
+        {
+          "n": "Chicken Milanese",
+          "d": "parmesan crusted, capers, champagne beurre blanc served with fettuccine alfredo",
+          "p": "30"
+        }
+      ]
+    },
+    {
+      "s": "SIGNATURE STEAKS",
+      "items": [
+        {
+          "n": "Steak Frites*",
+          "d": "sliced steakhouse style topped with sauce verte served with French fries",
+          "p": "36"
+        },
+        {
+          "n": "Prime Rib*",
+          "d": "served au jus, grated or creamy horseradish served with a loaded baked potato",
+          "p": "46"
+        },
+        {
+          "n": "Ribeye*",
+          "d": "maitre d’hôtel butter served with a twice baked potato",
+          "p": "52"
+        },
+        {
+          "n": "Filet Mignon*",
+          "d": "served with béarnaise and a loaded baked potato",
+          "p": "54"
+        }
+      ]
+    },
+    {
+      "s": "POTATOES, ETC.",
+      "items": [
+        {
+          "n": "Twice Baked Potato",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Loaded Baked Potato",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Creamy Whipped Potatoes",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "French Fries",
+          "d": "None listed",
+          "p": "10"
+        }
+      ]
+    },
+    {
+      "s": "SIDES",
+      "items": [
+        {
+          "n": "Sautéed Spinach",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Stir-Fried Vegetables",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Fettuccine Alfredo",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Cole Slaw",
+          "d": "None listed",
+          "p": "10"
+        },
+        {
+          "n": "Broccoli",
+          "d": "None listed",
+          "p": "10"
+        }
+      ]
+    }
+  ],
+  "New Realm Brewing Co.": [
+    {
+      "s": "Appetizers",
+      "items": [
+        {
+          "n": "Mediterranean Hummus Plate",
+          "d": "crispy chickpeas, feta cheese, cilantro, served with pita bread",
+          "p": "14.99"
+        },
+        {
+          "n": "Brewhouse Nachos",
+          "d": "beer cheese sauce, pulled chicken, pico de gallo, black beans, jalapeños, cilantro-lime crema",
+          "p": "15.49"
+        },
+        {
+          "n": "Asian-Style Loaded Fries",
+          "d": "char siu pork, sriracha, cilantro, garlic-miso mayo, green onions",
+          "p": "14.49"
+        },
+        {
+          "n": "Street Corn Dip",
+          "d": "fresh tortilla chips",
+          "p": "13.49"
+        },
+        {
+          "n": "Cheddar-Crusted Mac & Cheese",
+          "d": "",
+          "p": "14.99"
+        }
+      ]
+    },
+    {
+      "s": "Salads",
+      "items": [
+        {
+          "n": "Chicken Caesar",
+          "d": "croutons, parmesan, house-made caesar dressing",
+          "p": "15.99"
+        },
+        {
+          "n": "Coastal Crunch",
+          "d": "roasted corn, pico de gallo, toasted pepitas, cilantro, avocado, parmesan, red wine lime vinaigrette, chipotle aioli, queso fresco, tortillas strips",
+          "p": "15.99"
+        }
+      ]
+    },
+    {
+      "s": "Burgers",
+      "items": [
+        {
+          "n": "New Realm Smash Burger*",
+          "d": "two ground beef patties, american cheese, special sauce, pickles, brioche bun. Choice of caesar salad, coleslaw, or french fries",
+          "p": "15.99"
+        },
+        {
+          "n": "Smokehouse Burger*",
+          "d": "two ground beef patties, crispy bacon, american, grilled jalapeños, bbq sauce, grilled onions, tangy mayo, brioche bun. Choice of caesar salad, coleslaw, or french fries",
+          "p": "17.99"
+        },
+        {
+          "n": "Patty Melt",
+          "d": "two ground beef patties, marbled rye, grilled onions, swiss cheese, special sauce. Choice of caesar salad, coleslaw, or french fries",
+          "p": "16.99"
+        }
+      ]
+    },
+    {
+      "s": "Sandwiches",
+      "items": [
+        {
+          "n": "Roasted Turkey",
+          "d": "smoked turkey, white american, bacon, bibb lettuce, white bbq sauce. Choice of caesar salad, coleslaw, or french fries",
+          "p": "15.99"
+        },
+        {
+          "n": "Original Crispy Chicken",
+          "d": "mayo, pickle, brioche bun. Choice of caesar salad, coleslaw, or french fries",
+          "p": "16.49"
+        },
+        {
+          "n": "Spicy Buffalo Crispy Chicken",
+          "d": "blue cheese dressing, pickle, buffalo sauce. Choice of caesar salad, coleslaw, or french fries",
+          "p": "16.49"
+        },
+        {
+          "n": "Chicken Caesar Wrap",
+          "d": "romaine, parmesan, croutons, caesar dressing. Choice of caesar salad, coleslaw, or french fries",
+          "p": "15.49"
+        },
+        {
+          "n": "Buffalo Crispy Chicken Wrap",
+          "d": "romaine, cheddar, tomatoes, blue cheese, ranch. Choice of caesar salad, coleslaw, or french fries",
+          "p": "15.49"
+        },
+        {
+          "n": "Blackened Fish",
+          "d": "mahi mahi, tangy mayo, cabbage slaw. Choice of caesar salad, coleslaw, or french fries",
+          "p": "17.99"
+        }
+      ]
+    },
+    {
+      "s": "Pizza",
+      "items": [
+        {
+          "n": "Cheese",
+          "d": "mozzarella, tomato sauce. Hand-stretched dough, butter, garlic, parmesan crust",
+          "p": "19.99"
+        },
+        {
+          "n": "Pepperoni",
+          "d": "the american classic! - pepperoni, mozzarella, tomato sauce. Hand-stretched dough, butter, garlic, parmesan crust",
+          "p": "20.99"
+        },
+        {
+          "n": "Buffalo Chicken",
+          "d": "alfredo, mozzarella, hot buffalo chicken, ranch, green onions. Hand-stretched dough, butter, garlic, parmesan crust",
+          "p": "21.99"
+        },
+        {
+          "n": "Margherita",
+          "d": "tomato sauce, fresh mozzarella, torn basil. Hand-stretched dough, butter, garlic, parmesan crust",
+          "p": "20.99"
+        }
+      ]
+    },
+    {
+      "s": "Kids Menu",
+      "items": [
+        {
+          "n": "Cheeseburger",
+          "d": "",
+          "p": "9.00"
+        },
+        {
+          "n": "Chicken Tenders",
+          "d": "",
+          "p": "9.00"
+        },
+        {
+          "n": "Cheese Pizza",
+          "d": "",
+          "p": "9.00"
+        },
+        {
+          "n": "Pepperoni Pizza",
+          "d": "",
+          "p": "9.00"
+        },
+        {
+          "n": "Mac & Cheese",
+          "d": "",
+          "p": "9.00"
+        }
+      ]
+    },
+    {
+      "s": "Desserts",
+      "items": [
+        {
+          "n": "Warm Brownie",
+          "d": "vanilla ice cream, hot fudge",
+          "p": "10.99"
+        },
+        {
+          "n": "Chocolate Chip Cookie Skillet",
+          "d": "vanilla ice cream, chocolate sauce",
+          "p": "10.99"
+        }
+      ]
+    }
+  ],
+  "The Mockingbird": [
+    {
+      "s": "Savory",
+      "items": [
+        {
+          "n": "Poached Jumbo Prawns",
+          "d": "Bloody Mary cocktail sauce (4 shrimp)",
+          "p": "14"
+        },
+        {
+          "n": "Hummus",
+          "d": "Extra virgin olive oil, warmed pita",
+          "p": "6"
+        },
+        {
+          "n": "Chicken Tandoori Skewers",
+          "d": "Mint chutney yogurt",
+          "p": "8"
+        },
+        {
+          "n": "Caprese Panini",
+          "d": "Mozzarella, roasted cherry tomatoes, pesto, ciabatta, kettle chips",
+          "p": "12"
+        },
+        {
+          "n": "Turkey & Brie Panini",
+          "d": "Sliced turkey, brie, apple butter, ciabatta, kettle chips",
+          "p": "19"
+        },
+        {
+          "n": "Seasoned Potato Wedges",
+          "d": "Whole grain dijon aioli",
+          "p": "6"
+        },
+        {
+          "n": "Fresh Popcorn",
+          "d": "Rosemary garlic or truffle parmesan",
+          "p": "4"
+        },
+        {
+          "n": "Cheese & Charcuterie",
+          "d": "Grand Cru Reserve, aged gouda, buttermilk blue, fontina, 4-yr cheddar, salami, fig jam, crostinis",
+          "p": "18"
+        }
+      ]
+    },
+    {
+      "s": "Sweet",
+      "items": [
+        {
+          "n": "Churros",
+          "d": "Cinnamon sugar & salted caramel sauce",
+          "p": "8"
+        },
+        {
+          "n": "Italian Lemon Cake",
+          "d": "Fresh raspberries, whipped cream",
+          "p": "14"
+        },
+        {
+          "n": "3 Layer Chocolate Cake",
+          "d": "Shaved chocolate, whipped cream, candied orange peel",
+          "p": "14"
+        }
+      ]
+    },
+    {
+      "s": "Specialty Cocktails",
+      "items": [
+        {
+          "n": "The Mockingbird",
+          "d": "Monkey 47 Gin, housemade sour, Dolin Genepy, rosemary honey, Peychaud's, Bluebird Cuvee",
+          "p": "18"
+        },
+        {
+          "n": "Le Cabaret Bleu",
+          "d": "D'ussé VSOP, simple syrup, Bauchant, Bluebird Cuvee, orange peel",
+          "p": "17"
+        },
+        {
+          "n": "9th Ward",
+          "d": "Crown Royal Marquis, Dolin sweet vermouth, Averna Amaro, bitters",
+          "p": "15"
+        },
+        {
+          "n": "Smoke N Mirror",
+          "d": "Mezcal, Goslings dark rum, lime, orgeat, mint",
+          "p": "16"
+        },
+        {
+          "n": "The #10 Royale",
+          "d": "Bulleit Rye 10yr, Fernet Branca, absinthe rinse, Peychaud's",
+          "p": "19"
+        }
+      ]
+    }
+  ]
+};
+
 const R = [
   {
     name: "City Tavern", cuisine: "American Bar & Grill", address: "128 N Main St",
@@ -824,6 +4275,7 @@ function render() {
     if (r.website) actions += `<a href="${r.website}" target="_blank" rel="noopener" class="action-btn btn-website">Website \u2192</a>`;
     if (r.reservation) actions += `<a href="${r.reservation}" target="_blank" rel="noopener" class="action-btn btn-reserve">Reserve \u2192</a>`;
     if (r.phone) actions += `<a href="tel:${r.phone}" class="action-btn btn-call">Call \u2192</a>`;
+    if (MENUS[r.name]) actions += `<button class="action-btn btn-menu" onclick="event.stopPropagation();openMenu(${idx})">Menu \u2192</button>`;
 
     let detailLines = '';
     if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
@@ -879,6 +4331,41 @@ function toggle(idx) {
 }
 
 render();
+
+// Menu modal
+function openMenu(idx) {
+  const rest = R[idx];
+  if (!rest) return;
+  const menu = MENUS[rest.name];
+  if (!menu) return;
+  document.getElementById('menuTitle').textContent = rest.name;
+  document.getElementById('menuCuisine').textContent = rest ? rest.cuisine + ' \u00b7 ' + rest.price : '';
+  const body = document.getElementById('menuBody');
+  body.innerHTML = menu.map(sec => {
+    const items = sec.items.map(it => {
+      const priceStr = it.p ? (it.p.match(/^[\d.]+$/) ? '$' + it.p : it.p) : '';
+      return `<div class="menu-item">
+        <div class="menu-item-left">
+          <div class="menu-item-name">${it.n}</div>
+          ${it.d ? '<div class="menu-item-desc">' + it.d + '</div>' : ''}
+        </div>
+        ${priceStr ? '<div class="menu-item-price">' + priceStr + '</div>' : ''}
+      </div>`;
+    }).join('');
+    return `<div class="menu-section">
+      <div class="menu-section-name">${sec.s}</div>
+      ${items}
+    </div>`;
+  }).join('');
+  body.scrollTop = 0;
+  document.getElementById('menuOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  document.getElementById('menuOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 </script>
 </body>
 </html>
