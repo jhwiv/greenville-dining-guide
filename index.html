@@ -4096,17 +4096,6 @@ const MENUS = {
 
 const R = [
   {
-    name: "City Tavern", cuisine: "American Bar & Grill", address: "128 N Main St",
-    phone: "8644489928", phoneDisplay: "(864) 448-9928",
-    website: null, yelp: "https://www.yelp.com/biz/city-tavern-greenville",
-    reservation: null, reservationNote: "Walk-in only",
-    google: 4.4, yelpR: 3.5, tripadvisor: 4.0, price: "$$",
-    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u2013Late",
-    vibe: "Lively downtown bar with frozen drinks, live music, and a recently renovated space",
-    mustTry: "Frozen slushies, Cajun Philly cheesesteak, stuffed mushrooms",
-    staff: [["Lindsey",null],["Emily",null],["Sam",null]]
-  },
-  {
     name: "Blues Bar", cuisine: "Bar", address: "Downtown Greenville",
     phone: null, phoneDisplay: null,
     website: null, yelp: null,
@@ -4115,116 +4104,6 @@ const R = [
     michelin: false, wine: false, hours: "Evenings",
     vibe: "Live blues music and drinks", mustTry: null,
     staff: [["Todd",null],["Gerald",null]]
-  },
-  {
-    name: "Tahini Middle Eastern Eatery", cuisine: "Middle Eastern", address: "11 College St",
-    phone: null, phoneDisplay: null,
-    website: null, yelp: "https://www.yelp.com/biz/tahini-middle-eastern-eatery-greenville",
-    reservation: null, reservationNote: "Fast-casual, walk-in",
-    google: 4.7, yelpR: 4.5, tripadvisor: null, price: "$",
-    michelin: false, wine: false, hours: "11am\u20138pm",
-    vibe: "Authentic Syrian-owned fast-casual spot just off Main Street with bold flavors",
-    mustTry: "Traditional chicken shawarma sandwich, falafel (gluten-free), za\u2019atar fries",
-    staff: [["Habib",null],["Michael",null]]
-  },
-  {
-    name: "Curean", cuisine: "Mediterranean", address: "732A S Main St",
-    phone: "8644164610", phoneDisplay: "(864) 416-4610",
-    website: "https://cureangvl.com", yelp: "https://www.yelp.com/biz/curean-greenville",
-    reservation: "https://resy.com/cities/greenville-sc/venues/curean", reservationNote: "Resy",
-    google: 4.5, yelpR: 4.0, tripadvisor: 3.7, price: "$$",
-    michelin: false, wine: false, hours: "Wed\u2013Mon 5\u201310pm, Brunch Sat\u2013Sun",
-    vibe: "Cozy West End spot with build-your-own charcuterie and Mediterranean small plates",
-    mustTry: "Build-your-own charcuterie, Shrimp Santorini, Greek salad",
-    staff: [["Vicki","owner"],["Joe","dad"]]
-  },
-  {
-    name: "Soby\u2019s New South Cuisine", cuisine: "New South / Contemporary Southern", address: "207 S Main St",
-    phone: "8642327007", phoneDisplay: "(864) 232-7007",
-    website: "https://sobys.com", yelp: "https://www.yelp.com/biz/sobys-greenville",
-    reservation: "https://www.opentable.com/sobys", reservationNote: "OpenTable",
-    google: 4.5, yelpR: 4.0, tripadvisor: 4.4, price: "$$$",
-    michelin: true, wine: true, hours: "Dinner Mon\u2013Sun, Brunch Sat\u2013Sun",
-    vibe: "Iconic Greenville fine dining in a renovated cotton mill, landmark since 1997. Table 301 flagship.",
-    mustTry: "Fried green tomatoes, crab cakes, shrimp & grits, banana cream pie",
-    staff: [["Ashley","former Foxcroft"],["Maison","yinzer"],["Rachel",null],["Dakota","young mgr"],["Matt","som"],["Jason","a bit of a mess bartender"],["Michael","som"]]
-  },
-  {
-    name: "Northampton Wine + Dine", cuisine: "New American / Wine Bar", address: "211-A E Broad St",
-    phone: "8642713919", phoneDisplay: "(864) 271-3919",
-    website: "https://northamptonwineanddine.com", yelp: "https://www.yelp.com/biz/northampton-wine-dine-greenville-2",
-    reservation: "https://resy.com/cities/greenville-sc/venues/northampton-wine-and-dine", reservationNote: "Resy / Call",
-    google: 4.6, yelpR: 4.5, tripadvisor: 4.6, price: "$$$",
-    michelin: false, wine: false, hours: "Mon\u2013Sat 10am\u20139pm",
-    vibe: "1,500+ wine selections at retail + $10 corkage. Fine dining in a restored 1891 power station.",
-    mustTry: "Filet mignon, Scottish salmon, pan-seared scallops",
-    staff: [["Richard",null],["Shane",null],["Jamie",null],["David","silver hair"],["Capers",null]]
-  },
-  {
-    name: "Topsoil Kitchen & Market", cuisine: "Farm-to-Table", address: "13 S Main St, Travelers Rest",
-    phone: "8644005424", phoneDisplay: "(864) 400-5424",
-    website: "https://www.topsoilrestaurant.com", yelp: "https://www.yelp.com/biz/topsoil-kitchen-and-market-travelers-rest-2",
-    reservation: "https://www.opentable.com/r/topsoil-kitchen-and-market-travelers-rest", reservationNote: "OpenTable",
-    google: 4.7, yelpR: 4.5, tripadvisor: 4.4, price: "$$$",
-    michelin: true, wine: false, hours: "Thu\u2013Sat Dinner, Sat\u2013Sun Brunch, Sun Tasting",
-    vibe: "James Beard semi-finalist Chef Adam Cooke. Own 16-acre farm. Prix fixe & tasting menus. Jazz Thursdays.",
-    mustTry: "Prix fixe seasonal dinner, Sunday Chef\u2019s Tasting, chicken liver mousse",
-    staff: [["Sean",null],["Eric","Craig\u2019s son"]]
-  },
-  {
-    name: "Rick Erwin\u2019s West End Grille", cuisine: "Steakhouse / Fine Dining", address: "648 S Main St",
-    phone: "8643090335", phoneDisplay: "(864) 309-0335",
-    website: "https://www.rickerwins.com/west-end-grille/", yelp: "https://www.yelp.com/biz/rick-erwins-west-end-grill-greenville-2",
-    reservation: "https://www.opentable.com/r/rick-erwins-west-end-grille-greenville", reservationNote: "OpenTable",
-    google: 4.7, yelpR: 4.5, tripadvisor: 4.5, price: "$$$$",
-    michelin: false, wine: true, hours: "Mon\u2013Sat 4\u201310/11pm",
-    vibe: "Greenville\u2019s original upscale steakhouse. Linz Heritage Beef, mahogany & jazz ambiance. Complimentary valet.",
-    mustTry: "Crab cakes, prime steaks, she crab soup, key lime pie",
-    staff: [["Kevin",null],["Maria Erwin",null],["Liz","blonde"],["Mike",null],["Ellie",null],["Grace",null]]
-  },
-  {
-    name: "The Jones Oyster Co.", cuisine: "Seafood / Oyster Bar", address: "22 E Court St",
-    phone: "8645490301", phoneDisplay: "(864) 549-0301",
-    website: "https://www.thejonesoysterco.com", yelp: "https://www.yelp.com/biz/the-jones-oyster-greenville",
-    reservation: null, reservationNote: "Walk-in only (45 seats)",
-    google: 4.7, yelpR: 4.5, tripadvisor: 4.8, price: "$$",
-    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u20139/10pm",
-    vibe: "New England-style oyster bar by Table 301 in a historic space. Nautical charm, bustling raw bar.",
-    mustTry: "Raw oysters, lobster roll (CT or ME style), hush puppies, smoked fish dip",
-    staff: [["Emma",null],["Mike/Michael",null],["Clem",null],["Veles",null],["Free","shucker"],["Jesse",null],["Trinity",null]]
-  },
-  {
-    name: "Ristorante Bergamo", cuisine: "Northern Italian", address: "100 N Main St",
-    phone: "8642718667", phoneDisplay: "(864) 271-8667",
-    website: "https://www.ristorantebergamogreenville.com", yelp: "https://www.yelp.com/biz/ristorante-bergamo-greenville",
-    reservation: null, reservationNote: "Call to reserve",
-    google: 4.5, yelpR: 4.0, tripadvisor: 4.2, price: "$$$",
-    michelin: false, wine: false, hours: "Tue\u2013Sat 5:30\u20139:30pm",
-    vibe: "Downtown mainstay since 1986. NYC-trained Chef Gian Pietro Ferro brings Lombardy tradition.",
-    mustTry: "House-made pasta, Gamberoni in Brandy Cream, Scallopine con Porcini, daily specials",
-    staff: [["Kathy",null],["Michael",null],["JP",null],["David",null],["Tim",null],["Daniela","bald som/host"]]
-  },
-  {
-    name: "New Realm Brewing Co.", cuisine: "Brewery / American", address: "912 S Main St",
-    phone: null, phoneDisplay: null,
-    website: "https://newrealmbrewing.com/greenville/", yelp: "https://www.yelp.com/biz/new-realm-brewing-greenville",
-    reservation: null, reservationNote: "Walk-in, large venue",
-    google: 4.2, yelpR: 3.5, tripadvisor: 3.5, price: "$$",
-    michelin: false, wine: false, hours: "Daily 12\u201310pm, Fri\u2013Sat til midnight",
-    vibe: "Craft brewery in the historic Old Cigar Warehouse at Unity Park. Wood-fired kitchen, outdoor stage, live events.",
-    mustTry: "Wagyu burger, wood-fired pizza, house-brewed IPAs & pilsners",
-    staff: [["Christian",null],["Mary",null],["Carly",null],["Jessica",null],["Adam",null]]
-  },
-  {
-    name: "DeMarco\u2019s Italian", cuisine: "Italian-American", address: "366 Field St, Suite A",
-    phone: "8643991722", phoneDisplay: "(864) 399-1722",
-    website: "https://www.demarcositalian.com", yelp: "https://www.yelp.com/biz/demarcos-italian-greenville-3",
-    reservation: "https://resy.com/cities/greenville-sc/venues/demarcos-italian", reservationNote: "Resy",
-    google: 4.3, yelpR: 3.5, tripadvisor: 2.3, price: "$$",
-    michelin: false, wine: false, hours: "Mon\u2013Thu 4\u20139pm, Fri\u2013Sat 4\u201310pm, Sun 4\u20139pm",
-    vibe: "Family-owned in the West End by Fluor Field. Fresh dough daily, pastas from The Pasta Addict.",
-    mustTry: "New Yorker pizza, hand-tossed pies, tiramisu, cannoli",
-    staff: [["Teresa","curly dark hair"],["Darren",null],["Kyle","tall skinny"],["X","semi crabby behind bar"],["Jay","Urban Wren"],["Lisa","Greek makes the Soby\u2019s"],["Rem","metal detector"],["Fitz","new guy, bald, not Dan handsome"],["Gabriel","New level 1 Som"]]
   },
   {
     name: "BrickTop\u2019s", cuisine: "American Bistro / Steakhouse", address: "1 N Main St, Ste H",
@@ -4238,6 +4117,50 @@ const R = [
     staff: [["Andrea","on dray a"],["N\u2019chelle",null],["Kevin","meat sweats"],["Ginny",null]]
   },
   {
+    name: "City Tavern", cuisine: "American Bar & Grill", address: "128 N Main St",
+    phone: "8644489928", phoneDisplay: "(864) 448-9928",
+    website: null, yelp: "https://www.yelp.com/biz/city-tavern-greenville",
+    reservation: null, reservationNote: "Walk-in only",
+    google: 4.4, yelpR: 3.5, tripadvisor: 4.0, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u2013Late",
+    vibe: "Lively downtown bar with frozen drinks, live music, and a recently renovated space",
+    mustTry: "Frozen slushies, Cajun Philly cheesesteak, stuffed mushrooms",
+    staff: [["Lindsey",null],["Emily",null],["Sam",null]]
+  },
+  {
+    name: "Coral", cuisine: "Seafood / American", address: "654 S Main St",
+    phone: "8646190017", phoneDisplay: "(864) 619-0017",
+    website: "https://www.coralgreenville.com", yelp: "https://www.yelp.com/biz/coral-greenville",
+    reservation: "https://resy.com/cities/greenville-sc/venues/coral", reservationNote: "Resy recommended \u2013 walk-ins at bar",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.8, price: "$$$$",
+    michelin: false, wine: false, hours: "Tue\u2013Wed 5\u20139pm, Thu\u2013Sat 5\u201310pm, Bar opens 4pm",
+    vibe: "High-quality seafood with a vibrant bar scene on S Main. Three owner-operators work the floor nightly. Complimentary valet. Independently owned.",
+    mustTry: "Bangin\u2019 shrimp, halibut, sticky toffee pudding, ocean bread, sea scallops",
+    staff: [["Jennifer","owner"],["Dakota","owner"],["Chris","owner"],["Josh","executive chef"],["Tiffany",null]]
+  },
+  {
+    name: "Curean", cuisine: "Mediterranean", address: "732A S Main St",
+    phone: "8644164610", phoneDisplay: "(864) 416-4610",
+    website: "https://cureangvl.com", yelp: "https://www.yelp.com/biz/curean-greenville",
+    reservation: "https://resy.com/cities/greenville-sc/venues/curean", reservationNote: "Resy",
+    google: 4.5, yelpR: 4.0, tripadvisor: 3.7, price: "$$",
+    michelin: false, wine: false, hours: "Wed\u2013Mon 5\u201310pm, Brunch Sat\u2013Sun",
+    vibe: "Cozy West End spot with build-your-own charcuterie and Mediterranean small plates",
+    mustTry: "Build-your-own charcuterie, Shrimp Santorini, Greek salad",
+    staff: [["Vicki","owner"],["Joe","dad"]]
+  },
+  {
+    name: "DeMarco\u2019s Italian", cuisine: "Italian-American", address: "366 Field St, Suite A",
+    phone: "8643991722", phoneDisplay: "(864) 399-1722",
+    website: "https://www.demarcositalian.com", yelp: "https://www.yelp.com/biz/demarcos-italian-greenville-3",
+    reservation: "https://resy.com/cities/greenville-sc/venues/demarcos-italian", reservationNote: "Resy",
+    google: 4.3, yelpR: 3.5, tripadvisor: 2.3, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Thu 4\u20139pm, Fri\u2013Sat 4\u201310pm, Sun 4\u20139pm",
+    vibe: "Family-owned in the West End by Fluor Field. Fresh dough daily, pastas from The Pasta Addict.",
+    mustTry: "New Yorker pizza, hand-tossed pies, tiramisu, cannoli",
+    staff: [["Teresa","curly dark hair"],["Darren",null],["Kyle","tall skinny"],["X","semi crabby behind bar"],["Jay","Urban Wren"],["Lisa","Greek makes the Soby\u2019s"],["Rem","metal detector"],["Fitz","new guy, bald, not Dan handsome"],["Gabriel","New level 1 Som"]]
+  },
+  {
     name: "Jianna", cuisine: "Modern Italian / Oyster Bar", address: "600 S Main St, 2nd Floor",
     phone: "8647202200", phoneDisplay: "(864) 720-2200",
     website: "https://jiannagreenville.com", yelp: "https://www.yelp.com/biz/jianna-greenville",
@@ -4247,6 +4170,17 @@ const R = [
     vibe: "James Beard-nominated Chef Michael Kramer. House-made pastas, raw bar, Falls Park views. 40-ft signature bar.",
     mustTry: "House-made pastas, chilled oysters, potato gnocchi, olive oil cake",
     staff: [["Mike","big bald blonde"],["Kraya",null],["Sadie","short blond pony"],["Caroline","new tall girl"],["Derek","eager floor"],["Brandon","bar waiter"],["Andrew","John snow"],["Rowan","mgr, tall geeky"]]
+  },
+  {
+    name: "The Jones Oyster Co.", cuisine: "Seafood / Oyster Bar", address: "22 E Court St",
+    phone: "8645490301", phoneDisplay: "(864) 549-0301",
+    website: "https://www.thejonesoysterco.com", yelp: "https://www.yelp.com/biz/the-jones-oyster-greenville",
+    reservation: null, reservationNote: "Walk-in only (45 seats)",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.8, price: "$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 11am\u20139/10pm",
+    vibe: "New England-style oyster bar by Table 301 in a historic space. Nautical charm, bustling raw bar.",
+    mustTry: "Raw oysters, lobster roll (CT or ME style), hush puppies, smoked fish dip",
+    staff: [["Emma",null],["Mike/Michael",null],["Clem",null],["Veles",null],["Free","shucker"],["Jesse",null],["Trinity",null]]
   },
   {
     name: "The Matador", cuisine: "Mexican / Tequila Bar", address: "722 S Main St",
@@ -4271,15 +4205,81 @@ const R = [
     staff: [["Ayla",null],["Travis","boss/suit"]]
   },
   {
-    name: "Coral", cuisine: "Seafood / American", address: "654 S Main St",
-    phone: "8646190017", phoneDisplay: "(864) 619-0017",
-    website: "https://www.coralgreenville.com", yelp: "https://www.yelp.com/biz/coral-greenville",
-    reservation: "https://resy.com/cities/greenville-sc/venues/coral", reservationNote: "Resy recommended \u2013 walk-ins at bar",
-    google: 4.7, yelpR: 4.5, tripadvisor: 4.8, price: "$$$$",
-    michelin: false, wine: false, hours: "Tue\u2013Wed 5\u20139pm, Thu\u2013Sat 5\u201310pm, Bar opens 4pm",
-    vibe: "High-quality seafood with a vibrant bar scene on S Main. Three owner-operators work the floor nightly. Complimentary valet. Independently owned.",
-    mustTry: "Bangin\u2019 shrimp, halibut, sticky toffee pudding, ocean bread, sea scallops",
-    staff: [["Jennifer","owner"],["Dakota","owner"],["Chris","owner"],["Josh","executive chef"],["Tiffany",null]]
+    name: "New Realm Brewing Co.", cuisine: "Brewery / American", address: "912 S Main St",
+    phone: null, phoneDisplay: null,
+    website: "https://newrealmbrewing.com/greenville/", yelp: "https://www.yelp.com/biz/new-realm-brewing-greenville",
+    reservation: null, reservationNote: "Walk-in, large venue",
+    google: 4.2, yelpR: 3.5, tripadvisor: 3.5, price: "$$",
+    michelin: false, wine: false, hours: "Daily 12\u201310pm, Fri\u2013Sat til midnight",
+    vibe: "Craft brewery in the historic Old Cigar Warehouse at Unity Park. Wood-fired kitchen, outdoor stage, live events.",
+    mustTry: "Wagyu burger, wood-fired pizza, house-brewed IPAs & pilsners",
+    staff: [["Christian",null],["Mary",null],["Carly",null],["Jessica",null],["Adam",null]]
+  },
+  {
+    name: "Northampton Wine + Dine", cuisine: "New American / Wine Bar", address: "211-A E Broad St",
+    phone: "8642713919", phoneDisplay: "(864) 271-3919",
+    website: "https://northamptonwineanddine.com", yelp: "https://www.yelp.com/biz/northampton-wine-dine-greenville-2",
+    reservation: "https://resy.com/cities/greenville-sc/venues/northampton-wine-and-dine", reservationNote: "Resy / Call",
+    google: 4.6, yelpR: 4.5, tripadvisor: 4.6, price: "$$$",
+    michelin: false, wine: false, hours: "Mon\u2013Sat 10am\u20139pm",
+    vibe: "1,500+ wine selections at retail + $10 corkage. Fine dining in a restored 1891 power station.",
+    mustTry: "Filet mignon, Scottish salmon, pan-seared scallops",
+    staff: [["Richard",null],["Shane",null],["Jamie",null],["David","silver hair"],["Capers",null]]
+  },
+  {
+    name: "Rick Erwin\u2019s West End Grille", cuisine: "Steakhouse / Fine Dining", address: "648 S Main St",
+    phone: "8643090335", phoneDisplay: "(864) 309-0335",
+    website: "https://www.rickerwins.com/west-end-grille/", yelp: "https://www.yelp.com/biz/rick-erwins-west-end-grill-greenville-2",
+    reservation: "https://www.opentable.com/r/rick-erwins-west-end-grille-greenville", reservationNote: "OpenTable",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.5, price: "$$$$",
+    michelin: false, wine: true, hours: "Mon\u2013Sat 4\u201310/11pm",
+    vibe: "Greenville\u2019s original upscale steakhouse. Linz Heritage Beef, mahogany & jazz ambiance. Complimentary valet.",
+    mustTry: "Crab cakes, prime steaks, she crab soup, key lime pie",
+    staff: [["Kevin",null],["Maria Erwin",null],["Liz","blonde"],["Mike",null],["Ellie",null],["Grace",null]]
+  },
+  {
+    name: "Ristorante Bergamo", cuisine: "Northern Italian", address: "100 N Main St",
+    phone: "8642718667", phoneDisplay: "(864) 271-8667",
+    website: "https://www.ristorantebergamogreenville.com", yelp: "https://www.yelp.com/biz/ristorante-bergamo-greenville",
+    reservation: null, reservationNote: "Call to reserve",
+    google: 4.5, yelpR: 4.0, tripadvisor: 4.2, price: "$$$",
+    michelin: false, wine: false, hours: "Tue\u2013Sat 5:30\u20139:30pm",
+    vibe: "Downtown mainstay since 1986. NYC-trained Chef Gian Pietro Ferro brings Lombardy tradition.",
+    mustTry: "House-made pasta, Gamberoni in Brandy Cream, Scallopine con Porcini, daily specials",
+    staff: [["Kathy",null],["Michael",null],["JP",null],["David",null],["Tim",null],["Daniela","bald som/host"]]
+  },
+  {
+    name: "Soby\u2019s New South Cuisine", cuisine: "New South / Contemporary Southern", address: "207 S Main St",
+    phone: "8642327007", phoneDisplay: "(864) 232-7007",
+    website: "https://sobys.com", yelp: "https://www.yelp.com/biz/sobys-greenville",
+    reservation: "https://www.opentable.com/sobys", reservationNote: "OpenTable",
+    google: 4.5, yelpR: 4.0, tripadvisor: 4.4, price: "$$$",
+    michelin: true, wine: true, hours: "Dinner Mon\u2013Sun, Brunch Sat\u2013Sun",
+    vibe: "Iconic Greenville fine dining in a renovated cotton mill, landmark since 1997. Table 301 flagship.",
+    mustTry: "Fried green tomatoes, crab cakes, shrimp & grits, banana cream pie",
+    staff: [["Ashley","former Foxcroft"],["Maison","yinzer"],["Rachel",null],["Dakota","young mgr"],["Matt","som"],["Jason","a bit of a mess bartender"],["Michael","som"]]
+  },
+  {
+    name: "Tahini Middle Eastern Eatery", cuisine: "Middle Eastern", address: "11 College St",
+    phone: null, phoneDisplay: null,
+    website: null, yelp: "https://www.yelp.com/biz/tahini-middle-eastern-eatery-greenville",
+    reservation: null, reservationNote: "Fast-casual, walk-in",
+    google: 4.7, yelpR: 4.5, tripadvisor: null, price: "$",
+    michelin: false, wine: false, hours: "11am\u20138pm",
+    vibe: "Authentic Syrian-owned fast-casual spot just off Main Street with bold flavors",
+    mustTry: "Traditional chicken shawarma sandwich, falafel (gluten-free), za\u2019atar fries",
+    staff: [["Habib",null],["Michael",null]]
+  },
+  {
+    name: "Topsoil Kitchen & Market", cuisine: "Farm-to-Table", address: "13 S Main St, Travelers Rest",
+    phone: "8644005424", phoneDisplay: "(864) 400-5424",
+    website: "https://www.topsoilrestaurant.com", yelp: "https://www.yelp.com/biz/topsoil-kitchen-and-market-travelers-rest-2",
+    reservation: "https://www.opentable.com/r/topsoil-kitchen-and-market-travelers-rest", reservationNote: "OpenTable",
+    google: 4.7, yelpR: 4.5, tripadvisor: 4.4, price: "$$$",
+    michelin: true, wine: false, hours: "Thu\u2013Sat Dinner, Sat\u2013Sun Brunch, Sun Tasting",
+    vibe: "James Beard semi-finalist Chef Adam Cooke. Own 16-acre farm. Prix fixe & tasting menus. Jazz Thursdays.",
+    mustTry: "Prix fixe seasonal dinner, Sunday Chef\u2019s Tasting, chicken liver mousse",
+    staff: [["Sean",null],["Eric","Craig\u2019s son"]]
   }
 ];
 
