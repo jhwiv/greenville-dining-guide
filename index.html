@@ -81,7 +81,7 @@ body {
   color: #8a9baf;
 }
 
-/* SEARCH + FILTERS */
+/* SEARCH */
 .controls {
   max-width: 680px;
   margin: 0 auto;
@@ -97,35 +97,9 @@ body {
   background: var(--cream);
   color: var(--dark);
   outline: none;
-  margin-bottom: 10px;
 }
 .search-input:focus { border-color: var(--gold); }
 .search-input::placeholder { color: var(--muted); }
-
-.filters {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.filter-btn {
-  padding: 12px 16px;
-  min-height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: transparent;
-  color: var(--light);
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.filter-btn.active {
-  background: var(--navy);
-  color: var(--gold);
-  border-color: var(--navy);
-}
 
 /* CARDS */
 .cards {
@@ -771,11 +745,6 @@ body.reordering .card:not(.dragging) {
   outline-offset: -2px;
   border-radius: 6px;
 }
-.filter-btn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
 /* Animations — fade only (do NOT keyframe transform on .card; it would
    lock the inline transform used for drag-to-reorder via animation-fill-mode). */
 @keyframes fadeIn {
@@ -881,9 +850,8 @@ body.reordering .card:not(.dragging) {
 </header>
 
 <main role="main">
-<nav class="controls" aria-label="Search and filters">
+<nav class="controls" aria-label="Search">
   <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff..." aria-label="Search restaurants">
-  <div class="filters" id="filters" role="group" aria-label="Filter restaurants"></div>
   <div class="global-controls">
     <span class="reorder-hint" data-testid="reorder-hint">Drag &#9776; to reorder &middot; top 5 are your favorites</span>
   </div>
@@ -4431,19 +4399,6 @@ const totalStaff = R.reduce((s,r) => s + r.staff.length, 0);
 const micCount = R.filter(r => r.michelin).length;
 document.getElementById('stats').textContent = `${R.length} restaurants \u00b7 ${totalStaff} staff \u00b7 ${micCount} MICHELIN recommended`;
 
-// Filters
-const filterDefs = [["all","All"],["michelin","MICHELIN"],["wine","Wine Spectator"],["fine","Fine Dining"],["walkin","Walk-in Only"]];
-const filtersEl = document.getElementById('filters');
-let activeFilter = 'all';
-filterDefs.forEach(([key,label]) => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (key === 'all' ? ' active' : '');
-  btn.textContent = label;
-  btn.dataset.key = key;
-  btn.onclick = () => { activeFilter = key; document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key)); render(); };
-  filtersEl.appendChild(btn);
-});
-
 document.getElementById('search').addEventListener('input', render);
 
 function ratingColor(v) {
@@ -4631,13 +4586,7 @@ function render() {
   const listDivider = document.getElementById('listDivider');
 
   const matches = r => {
-    const matchQ = !q || r.name.toLowerCase().includes(q) || r.cuisine.toLowerCase().includes(q) || r.staff.some(s => s[0].toLowerCase().includes(q) || (s[1]||'').toLowerCase().includes(q));
-    const matchF = activeFilter === 'all'
-      || (activeFilter === 'michelin' && r.michelin)
-      || (activeFilter === 'wine' && r.wine)
-      || (activeFilter === 'fine' && (r.price === '$$$' || r.price === '$$$$'))
-      || (activeFilter === 'walkin' && !r.reservation);
-    return matchQ && matchF;
+    return !q || r.name.toLowerCase().includes(q) || r.cuisine.toLowerCase().includes(q) || r.staff.some(s => s[0].toLowerCase().includes(q) || (s[1]||'').toLowerCase().includes(q));
   };
 
   // Resolve restaurants in user-defined order
@@ -4648,10 +4597,10 @@ function render() {
   const pinnedFiltered = pinnedSlice.filter(matches);
   const restFiltered = restSlice.filter(matches);
 
-  // Hide Try Next when search/filter is active
+  // Hide Try Next when search is active
   const tryNextEl = document.getElementById('tryNext');
   if (tryNextEl) {
-    tryNextEl.style.display = (q || activeFilter !== 'all') ? 'none' : '';
+    tryNextEl.style.display = q ? 'none' : '';
   }
 
   if (pinnedFiltered.length) {
