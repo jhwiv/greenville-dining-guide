@@ -776,10 +776,11 @@ body.reordering .card:not(.dragging) {
   outline-offset: 2px;
 }
 
-/* Animations */
+/* Animations — fade only (do NOT keyframe transform on .card; it would
+   lock the inline transform used for drag-to-reorder via animation-fill-mode). */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .card { animation: fadeIn 0.3s ease both; }
 
@@ -4778,13 +4779,18 @@ function onPointerDown(e) {
   document.body.classList.add('reordering');
   document.body.setAttribute('data-reordering', 'true');
 
-  handle.addEventListener('pointermove', onPointerMove);
-  handle.addEventListener('pointerup', onPointerUp);
-  handle.addEventListener('pointercancel', onPointerUp);
+  // Listen on the document so the drag survives pointer-capture loss.
+  // (Capture is dropped by Chromium when the captured element is moved across
+  //  sub-trees via insertBefore — which we do whenever a card crosses the
+  //  pinned/main section boundary mid-drag.)
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('pointercancel', onPointerUp);
 }
 
 function onPointerMove(e) {
   if (!dragState) return;
+  if (e.pointerId !== dragState.pointerId) return;
   dragState.moved = true;
   dragState.pendingX = e.clientX;
   dragState.pendingY = e.clientY;
@@ -4910,11 +4916,12 @@ function reorderDomAndOrder(card, targetCard, insertBefore, workingOrder, name, 
 
 function onPointerUp(e) {
   if (!dragState) return;
+  if (e && e.pointerId !== undefined && e.pointerId !== dragState.pointerId) return;
   const { name, handle, card, workingOrder, moved } = dragState;
   try { handle.releasePointerCapture(dragState.pointerId); } catch (err) {}
-  handle.removeEventListener('pointermove', onPointerMove);
-  handle.removeEventListener('pointerup', onPointerUp);
-  handle.removeEventListener('pointercancel', onPointerUp);
+  document.removeEventListener('pointermove', onPointerMove);
+  document.removeEventListener('pointerup', onPointerUp);
+  document.removeEventListener('pointercancel', onPointerUp);
   handle.classList.remove('dragging');
 
   // Animate dragged card back to its slot
