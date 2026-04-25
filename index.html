@@ -229,16 +229,59 @@ body {
 }
 .card.expanded .chevron { transform: rotate(180deg); }
 
-/* Pin button on card */
-.pin-btn {
+/* Per-restaurant staff toggle (next to name) */
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.staff-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  height: 22px;
+  background: var(--navy);
+  color: var(--cream);
+  border: 1px solid var(--navy);
+  border-radius: 11px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.staff-btn:hover, .staff-btn:focus-visible {
+  background: #243d55;
+}
+.staff-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.staff-btn .staff-btn-chevron {
+  color: var(--gold);
+  font-size: 9px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.card.staff-visible .staff-btn .staff-btn-chevron {
+  transform: rotate(180deg);
+}
+
+/* Drag handle (hamburger) on card */
+.drag-handle {
   background: none;
   border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
+  color: var(--light);
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: grab;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -246,23 +289,40 @@ body {
   line-height: 1;
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  flex-shrink: 0;
 }
-.pin-btn:hover, .pin-btn:focus-visible {
+.drag-handle:hover, .drag-handle:focus-visible {
   border-color: var(--gold);
-  color: var(--gold);
+  color: var(--navy);
+  background: var(--dark-cream);
 }
-.pin-btn.pinned {
+.drag-handle:active, .drag-handle.dragging {
+  cursor: grabbing;
   background: var(--gold);
   border-color: var(--gold);
   color: var(--navy);
 }
-.pin-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-.pin-btn:focus-visible {
+.drag-handle:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+.drag-handle svg {
+  display: block;
+  pointer-events: none;
+}
+
+.card.dragging {
+  opacity: 0.55;
+  box-shadow: 0 6px 18px rgba(26,46,64,0.2);
+}
+.card.drop-target-above {
+  border-top: 2px solid var(--gold);
+}
+.card.drop-target-below {
+  border-bottom: 2px solid var(--gold);
 }
 
 /* Card body */
@@ -404,7 +464,7 @@ body {
   max-width: 60%;
 }
 
-/* Global staff toggle in controls */
+/* Global controls row */
 .global-controls {
   display: flex;
   align-items: center;
@@ -413,46 +473,14 @@ body {
   margin-top: 10px;
   flex-wrap: wrap;
 }
-.global-staff-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: var(--navy);
-  color: #fff;
-  border: 1px solid var(--navy);
-  border-radius: 20px;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.global-staff-toggle:hover, .global-staff-toggle:focus-visible {
-  background: #243d55;
-}
-.global-staff-toggle .staff-chevron {
-  color: var(--gold);
-  font-size: 11px;
-  transition: transform 0.2s;
-  display: inline-block;
-}
-.global-staff-toggle.open .staff-chevron {
-  transform: rotate(180deg);
-}
-.global-staff-toggle:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-.pin-counter {
+.reorder-hint {
   font-family: 'DM Mono', monospace;
   font-size: 10px;
   color: var(--muted);
   letter-spacing: 0.5px;
 }
 
-/* Pinned section header */
+/* Top-Five (pinned) section header */
 .pinned-section {
   max-width: 680px;
   margin: 0 auto;
@@ -839,17 +867,14 @@ body {
   <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff..." aria-label="Search restaurants">
   <div class="filters" id="filters" role="group" aria-label="Filter restaurants"></div>
   <div class="global-controls">
-    <button type="button" id="globalStaffToggle" class="global-staff-toggle" aria-pressed="false" data-testid="global-staff-toggle">
-      <span id="globalStaffLabel">Show staff &amp; nicknames</span> <span class="staff-chevron">&#9662;</span>
-    </button>
-    <span class="pin-counter" id="pinCounter" data-testid="pin-counter" aria-live="polite"></span>
+    <span class="reorder-hint" data-testid="reorder-hint">Drag &#9776; to reorder &middot; top 5 are your favorites</span>
   </div>
 </nav>
 
-<section class="pinned-section" id="pinnedSection" data-testid="pinned-section" aria-label="Pinned favorites" hidden>
-  <div class="pinned-label" id="pinnedLabel">Pinned Favorites</div>
+<section class="pinned-section" id="pinnedSection" data-testid="pinned-section" aria-label="Top five favorites" hidden>
+  <div class="pinned-label" id="pinnedLabel">Top Five</div>
 </section>
-<div class="cards" id="pinnedCards" role="list" aria-label="Pinned restaurants" data-testid="pinned-cards"></div>
+<div class="cards" id="pinnedCards" role="list" aria-label="Top five restaurants" data-testid="pinned-cards"></div>
 <div class="list-divider" id="listDivider" hidden><hr></div>
 <div class="cards" id="cards" role="list" aria-label="Restaurant cards" data-testid="all-cards"></div>
 
@@ -4425,11 +4450,11 @@ function staffHTML(staff) {
 }
 
 let expandedIdx = null;
+const staffOpen = new Set(); // restaurant names with staff currently expanded
 
-// Persistence for staff visibility and pinned favorites
-const LS_STAFF = 'gvl.staffVisible';
-const LS_PINS = 'gvl.pinnedNames';
-const MAX_PINS = 5;
+// Persistence
+const LS_ORDER = 'gvl.order';
+const TOP_N = 5;
 
 function safeGet(key) {
   try { return localStorage.getItem(key); } catch (e) { return null; }
@@ -4438,65 +4463,63 @@ function safeSet(key, value) {
   try { localStorage.setItem(key, value); } catch (e) {}
 }
 
-let staffVisible = safeGet(LS_STAFF) === '1';
-let pinnedNames = (() => {
+// User-defined ordering of restaurants (by name). First TOP_N are the favorites.
+let order = (() => {
+  const defaultOrder = R.map(r => r.name);
   try {
-    const raw = safeGet(LS_PINS);
-    if (!raw) return [];
+    const raw = safeGet(LS_ORDER);
+    if (!raw) return defaultOrder;
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(n => typeof n === 'string' && R.some(r => r.name === n)).slice(0, MAX_PINS);
-  } catch (e) { return []; }
+    if (!Array.isArray(parsed)) return defaultOrder;
+    const valid = parsed.filter(n => typeof n === 'string' && R.some(r => r.name === n));
+    // append any restaurants missing from saved order (e.g. new additions)
+    defaultOrder.forEach(n => { if (valid.indexOf(n) === -1) valid.push(n); });
+    return valid;
+  } catch (e) { return defaultOrder; }
 })();
 
-function savePins() {
-  safeSet(LS_PINS, JSON.stringify(pinnedNames));
+function saveOrder() {
+  safeSet(LS_ORDER, JSON.stringify(order));
 }
 
-function isPinned(name) { return pinnedNames.indexOf(name) !== -1; }
+function isPinned(name) {
+  return order.indexOf(name) !== -1 && order.indexOf(name) < TOP_N;
+}
 
-function togglePin(name) {
-  const i = pinnedNames.indexOf(name);
-  if (i !== -1) {
-    pinnedNames.splice(i, 1);
-  } else {
-    if (pinnedNames.length >= MAX_PINS) return false;
-    pinnedNames.push(name);
-  }
-  savePins();
+function moveInOrder(name, targetIdx) {
+  const from = order.indexOf(name);
+  if (from === -1) return;
+  if (targetIdx < 0) targetIdx = 0;
+  if (targetIdx > order.length - 1) targetIdx = order.length - 1;
+  order.splice(from, 1);
+  // adjust if we removed before target
+  if (from < targetIdx) targetIdx -= 1;
+  // wait, splice removed one — re-clamp
+  if (targetIdx > order.length) targetIdx = order.length;
+  order.splice(targetIdx, 0, name);
+  saveOrder();
+}
+
+function moveByDelta(name, delta) {
+  const from = order.indexOf(name);
+  if (from === -1) return;
+  const to = Math.max(0, Math.min(order.length - 1, from + delta));
+  if (to === from) return;
+  order.splice(from, 1);
+  order.splice(to, 0, name);
+  saveOrder();
   render();
-  return true;
 }
-
-function updateGlobalStaffToggleUI() {
-  const btn = document.getElementById('globalStaffToggle');
-  const label = document.getElementById('globalStaffLabel');
-  btn.classList.toggle('open', staffVisible);
-  btn.setAttribute('aria-pressed', String(staffVisible));
-  label.textContent = staffVisible ? 'Hide staff & nicknames' : 'Show staff & nicknames';
-}
-
-function updatePinCounter() {
-  const el = document.getElementById('pinCounter');
-  el.textContent = `${pinnedNames.length}/${MAX_PINS} pinned`;
-}
-
-document.getElementById('globalStaffToggle').addEventListener('click', () => {
-  staffVisible = !staffVisible;
-  safeSet(LS_STAFF, staffVisible ? '1' : '0');
-  updateGlobalStaffToggleUI();
-  render();
-});
 
 function cardHTML(r, opts) {
   const idx = R.indexOf(r);
   const exp = expandedIdx === idx;
   const pinned = isPinned(r.name);
-  const limitReached = pinnedNames.length >= MAX_PINS && !pinned;
+  const showStaff = staffOpen.has(r.name);
   let cls = 'card';
   if (exp) cls += ' expanded';
   if (pinned) cls += ' pinned';
-  if (staffVisible) cls += ' staff-visible';
+  if (showStaff) cls += ' staff-visible';
 
   let badges = '';
   if (r.michelin) badges += '<span class="badge badge-michelin">MICHELIN</span>';
@@ -4514,22 +4537,26 @@ function cardHTML(r, opts) {
   detailLines += `<div class="detail-line">\u23f0 ${r.hours}</div>`;
   detailLines += `<div class="detail-line">\ud83e\ude91 ${r.reservationNote}</div>`;
 
-  const pinTitle = pinned
-    ? 'Unpin this restaurant'
-    : (limitReached ? `Pin limit reached (${MAX_PINS})` : 'Pin to favorites');
-  const pinAria = pinned ? `Unpin ${r.name}` : `Pin ${r.name} to favorites`;
   const dataIdAttr = opts && opts.section ? `data-idx-${opts.section}="${idx}"` : `data-idx="${idx}"`;
+  const safeName = r.name.replace(/"/g,'&quot;');
+  const staffAria = showStaff ? `Hide staff for ${r.name}` : `Show staff for ${r.name}`;
+  const dragAria = `Drag to reorder ${r.name}. Currently position ${order.indexOf(r.name) + 1} of ${order.length}.`;
 
-  return `<div class="${cls}" ${dataIdAttr} data-name="${r.name.replace(/"/g,'&quot;')}" role="listitem" data-testid="restaurant-card">
+  return `<div class="${cls}" ${dataIdAttr} data-name="${safeName}" role="listitem" data-testid="restaurant-card">
     <div class="card-head" tabindex="0" role="button" aria-expanded="${exp}" onclick="toggle(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle(${idx})}">
       <div class="card-head-main">
-        <div>
+        <div class="name-row">
           <span class="card-name">${r.name}</span>${badges ? '<span class="card-badges">'+badges+'</span>' : ''}
+          <button type="button" class="staff-btn" data-testid="staff-toggle-btn" aria-pressed="${showStaff}" aria-label="${staffAria}" onclick="event.stopPropagation();toggleStaff(this.closest('[data-name]').getAttribute('data-name'))">
+            <span>Staff</span> <span class="staff-btn-chevron">\u25be</span>
+          </button>
         </div>
         <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
       </div>
       <div class="card-right">
-        <button type="button" class="pin-btn${pinned ? ' pinned' : ''}" data-testid="pin-btn" aria-label="${pinAria}" aria-pressed="${pinned}" title="${pinTitle}" ${limitReached ? 'disabled' : ''} onclick="event.stopPropagation();togglePinByName(this.closest('[data-name]').getAttribute('data-name'))">${pinned ? '\u2605' : '\u2606'}</button>
+        <button type="button" class="drag-handle" data-testid="drag-handle" aria-label="${dragAria}" title="Drag to reorder. First 5 are your favorites." onclick="event.stopPropagation()" onkeydown="handleHandleKey(event, this.closest('[data-name]').getAttribute('data-name'))">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
         <span class="chevron">\u25be</span>
       </div>
     </div>
@@ -4555,13 +4582,24 @@ function cardHTML(r, opts) {
   </div>`;
 }
 
-function togglePinByName(name) {
-  const ok = togglePin(name);
-  if (!ok) {
-    const counter = document.getElementById('pinCounter');
-    counter.style.color = 'var(--michelin)';
-    setTimeout(() => { counter.style.color = ''; }, 1200);
-  }
+function toggleStaff(name) {
+  if (staffOpen.has(name)) staffOpen.delete(name);
+  else staffOpen.add(name);
+  render();
+}
+
+function handleHandleKey(e, name) {
+  if (e.key === 'ArrowUp') { e.preventDefault(); moveByDelta(name, -1); refocusHandle(name); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); moveByDelta(name, 1); refocusHandle(name); }
+  else if (e.key === 'Home') { e.preventDefault(); moveByDelta(name, -order.length); refocusHandle(name); }
+  else if (e.key === 'End') { e.preventDefault(); moveByDelta(name, order.length); refocusHandle(name); }
+}
+
+function refocusHandle(name) {
+  setTimeout(() => {
+    const el = document.querySelector(`[data-name="${name.replace(/"/g,'&quot;')}"] .drag-handle`);
+    if (el) el.focus();
+  }, 0);
 }
 
 function render() {
@@ -4571,7 +4609,7 @@ function render() {
   const pinnedSection = document.getElementById('pinnedSection');
   const listDivider = document.getElementById('listDivider');
 
-  const filtered = R.filter(r => {
+  const matches = r => {
     const matchQ = !q || r.name.toLowerCase().includes(q) || r.cuisine.toLowerCase().includes(q) || r.staff.some(s => s[0].toLowerCase().includes(q) || (s[1]||'').toLowerCase().includes(q));
     const matchF = activeFilter === 'all'
       || (activeFilter === 'michelin' && r.michelin)
@@ -4579,7 +4617,15 @@ function render() {
       || (activeFilter === 'fine' && (r.price === '$$$' || r.price === '$$$$'))
       || (activeFilter === 'walkin' && !r.reservation);
     return matchQ && matchF;
-  });
+  };
+
+  // Resolve restaurants in user-defined order
+  const ordered = order.map(n => R.find(r => r.name === n)).filter(Boolean);
+  const pinnedSlice = ordered.slice(0, TOP_N);
+  const restSlice = ordered.slice(TOP_N);
+
+  const pinnedFiltered = pinnedSlice.filter(matches);
+  const restFiltered = restSlice.filter(matches);
 
   // Hide Try Next when search/filter is active
   const tryNextEl = document.getElementById('tryNext');
@@ -4587,29 +4633,23 @@ function render() {
     tryNextEl.style.display = (q || activeFilter !== 'all') ? 'none' : '';
   }
 
-  // Pinned cards: keep user-defined order from pinnedNames, restricted to filtered set
-  const filteredNames = new Set(filtered.map(r => r.name));
-  const pinnedFiltered = pinnedNames
-    .filter(n => filteredNames.has(n))
-    .map(n => R.find(r => r.name === n));
-
   if (pinnedFiltered.length) {
     pinnedSection.hidden = false;
     pinnedCards.innerHTML = pinnedFiltered.map(r => cardHTML(r, { section: 'pinned' })).join('');
-    listDivider.hidden = false;
+    listDivider.hidden = !restFiltered.length;
   } else {
     pinnedSection.hidden = true;
     pinnedCards.innerHTML = '';
     listDivider.hidden = true;
   }
 
-  if (!filtered.length) {
+  if (!pinnedFiltered.length && !restFiltered.length) {
     allCards.innerHTML = '<div class="no-results">No restaurants match your search.</div>';
   } else {
-    allCards.innerHTML = filtered.map(r => cardHTML(r, { section: 'all' })).join('');
+    allCards.innerHTML = restFiltered.map(r => cardHTML(r, { section: 'all' })).join('');
   }
 
-  updatePinCounter();
+  attachDragHandlers();
 }
 
 function toggle(idx) {
@@ -4617,13 +4657,125 @@ function toggle(idx) {
   render();
   if (expandedIdx !== null) {
     setTimeout(() => {
-      const el = document.querySelector(`[data-idx-all="${idx}"], [data-idx="${idx}"]`);
+      const el = document.querySelector(`[data-idx-all="${idx}"], [data-idx-pinned="${idx}"], [data-idx="${idx}"]`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
   }
 }
 
-updateGlobalStaffToggleUI();
+// ----- Drag & drop reordering -----
+let dragState = null;
+
+function getCardEls() {
+  return Array.from(document.querySelectorAll('#pinnedCards [data-testid="restaurant-card"], #cards [data-testid="restaurant-card"]'));
+}
+
+function clearDropMarkers() {
+  document.querySelectorAll('.drop-target-above, .drop-target-below').forEach(el => {
+    el.classList.remove('drop-target-above', 'drop-target-below');
+  });
+}
+
+function attachDragHandlers() {
+  document.querySelectorAll('[data-testid="drag-handle"]').forEach(handle => {
+    handle.addEventListener('pointerdown', onPointerDown);
+  });
+}
+
+function onPointerDown(e) {
+  if (e.button !== undefined && e.button !== 0) return;
+  const handle = e.currentTarget;
+  const card = handle.closest('[data-testid="restaurant-card"]');
+  if (!card) return;
+  const name = card.getAttribute('data-name');
+  e.preventDefault();
+  try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+  handle.classList.add('dragging');
+  card.classList.add('dragging');
+  dragState = {
+    name,
+    pointerId: e.pointerId,
+    handle,
+    card,
+    moved: false,
+    targetName: null,
+    targetSide: null
+  };
+  document.body.style.userSelect = 'none';
+  handle.addEventListener('pointermove', onPointerMove);
+  handle.addEventListener('pointerup', onPointerUp);
+  handle.addEventListener('pointercancel', onPointerUp);
+}
+
+function onPointerMove(e) {
+  if (!dragState) return;
+  dragState.moved = true;
+  const y = e.clientY;
+  const cards = getCardEls();
+  let target = null;
+  let side = null;
+  for (const c of cards) {
+    if (c === dragState.card) continue;
+    const rect = c.getBoundingClientRect();
+    if (y >= rect.top && y <= rect.bottom) {
+      target = c;
+      side = (y < rect.top + rect.height / 2) ? 'above' : 'below';
+      break;
+    }
+  }
+  // edge cases: above first or below last
+  if (!target && cards.length) {
+    const first = cards[0];
+    const last = cards[cards.length - 1];
+    if (y < first.getBoundingClientRect().top) { target = first; side = 'above'; }
+    else if (y > last.getBoundingClientRect().bottom) { target = last; side = 'below'; }
+  }
+  clearDropMarkers();
+  if (target && target !== dragState.card) {
+    target.classList.add(side === 'above' ? 'drop-target-above' : 'drop-target-below');
+    dragState.targetName = target.getAttribute('data-name');
+    dragState.targetSide = side;
+  } else {
+    dragState.targetName = null;
+    dragState.targetSide = null;
+  }
+
+  // edge auto-scroll
+  const margin = 60;
+  const vh = window.innerHeight;
+  if (y < margin) window.scrollBy(0, -8);
+  else if (y > vh - margin) window.scrollBy(0, 8);
+}
+
+function onPointerUp(e) {
+  if (!dragState) return;
+  const { name, handle, card, targetName, targetSide, moved } = dragState;
+  try { handle.releasePointerCapture(dragState.pointerId); } catch (err) {}
+  handle.removeEventListener('pointermove', onPointerMove);
+  handle.removeEventListener('pointerup', onPointerUp);
+  handle.removeEventListener('pointercancel', onPointerUp);
+  handle.classList.remove('dragging');
+  card.classList.remove('dragging');
+  document.body.style.userSelect = '';
+  clearDropMarkers();
+  dragState = null;
+
+  if (!moved || !targetName || targetName === name) return;
+  // Compute new index in `order` based on target name and side
+  const fromIdx = order.indexOf(name);
+  let toIdx = order.indexOf(targetName);
+  if (fromIdx === -1 || toIdx === -1) return;
+  // Remove first
+  order.splice(fromIdx, 1);
+  if (fromIdx < toIdx) toIdx -= 1;
+  if (targetSide === 'below') toIdx += 1;
+  if (toIdx < 0) toIdx = 0;
+  if (toIdx > order.length) toIdx = order.length;
+  order.splice(toIdx, 0, name);
+  saveOrder();
+  render();
+}
+
 render();
 
 // Menu modal
