@@ -131,16 +131,16 @@ body {
 .cards {
   max-width: 680px;
   margin: 0 auto;
-  padding: 14px;
+  padding: 8px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
 }
 
 .card {
   background: var(--cream);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
   transition: box-shadow 0.2s;
   scroll-margin-top: 140px;
@@ -148,36 +148,46 @@ body {
 .card.expanded {
   box-shadow: 0 4px 24px rgba(26,46,64,0.12);
 }
+.card.pinned {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold) inset;
+}
 
 /* Card header (always visible) */
 .card-head {
-  padding: 16px 18px;
+  padding: 8px 10px 8px 12px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
   -webkit-tap-highlight-color: transparent;
 }
 .card.expanded .card-head {
   border-bottom: 1px solid var(--border);
 }
+.card-head-main {
+  flex: 1;
+  min-width: 0;
+}
 .card-name {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 19px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--navy);
   line-height: 1.2;
+  display: inline;
 }
 .card-badges {
-  display: flex;
-  gap: 5px;
+  display: inline-flex;
+  gap: 4px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
 }
 .badge {
   display: inline-block;
-  padding: 2px 8px;
+  padding: 1px 6px;
   font-family: 'DM Mono', monospace;
   font-size: 8px;
   font-weight: 700;
@@ -185,40 +195,80 @@ body {
   text-transform: uppercase;
   color: var(--white);
   border-radius: 3px;
+  vertical-align: middle;
 }
 .badge-michelin { background: var(--michelin); }
 .badge-wine { background: var(--wine); }
 
 .card-meta {
   font-family: 'DM Mono', monospace;
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--light);
-  margin-top: 4px;
-  line-height: 1.5;
+  margin-top: 2px;
+  line-height: 1.4;
 }
 
 .card-right {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
-  padding-top: 2px;
 }
 .card-staff-row {
-  margin-top: 6px;
+  display: none;
+  padding: 0 12px 10px;
+}
+.card.staff-visible .card-staff-row {
+  display: block;
 }
 .chevron {
-  font-size: 20px;
+  font-size: 16px;
   color: var(--muted);
   transition: transform 0.2s;
   line-height: 1;
 }
 .card.expanded .chevron { transform: rotate(180deg); }
 
+/* Pin button on card */
+.pin-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin-btn:hover, .pin-btn:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.pin-btn.pinned {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+.pin-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.pin-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 /* Card body */
 .card-body {
   display: none;
-  padding: 16px 18px;
+  padding: 14px 16px;
 }
 .card.expanded .card-body { display: block; }
 
@@ -324,15 +374,53 @@ body {
   line-height: 1.55;
 }
 
-/* Staff panel */
-.staff-toggle {
+/* Staff panel (per-card, shown when global staff toggle is on) */
+.staff-panel {
+  background: var(--navy);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.staff-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.staff-row:last-child {
+  border-bottom: none;
+}
+.staff-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+.staff-role {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  text-align: right;
+  max-width: 60%;
+}
+
+/* Global staff toggle in controls */
+.global-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.global-staff-toggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 8px 14px;
   background: var(--navy);
   color: #fff;
-  border: none;
+  border: 1px solid var(--navy);
   border-radius: 20px;
   font-family: 'DM Mono', monospace;
   font-size: 11px;
@@ -341,50 +429,60 @@ body {
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.staff-toggle:hover, .staff-toggle:focus-visible {
+.global-staff-toggle:hover, .global-staff-toggle:focus-visible {
   background: #243d55;
 }
-.staff-toggle .staff-chevron {
+.global-staff-toggle .staff-chevron {
   color: var(--gold);
-  font-size: 12px;
+  font-size: 11px;
   transition: transform 0.2s;
   display: inline-block;
 }
-.staff-toggle.open .staff-chevron {
+.global-staff-toggle.open .staff-chevron {
   transform: rotate(180deg);
 }
-.staff-panel {
-  display: none;
-  margin-top: 10px;
-  background: var(--navy);
-  border-radius: 12px;
-  padding: 14px 18px;
+.global-staff-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
-.staff-toggle.open + .staff-panel {
-  display: block;
-}
-.staff-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.staff-row:last-child {
-  border-bottom: none;
-}
-.staff-name {
-  font-family: 'Crimson Pro', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-}
-.staff-role {
+.pin-counter {
   font-family: 'DM Mono', monospace;
-  font-size: 12px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+/* Pinned section header */
+.pinned-section {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 8px 14px 0;
+}
+.pinned-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   color: var(--gold);
-  text-align: right;
-  max-width: 55%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.pinned-label::before {
+  content: "\2605";
+  font-size: 12px;
+}
+.list-divider {
+  max-width: 680px;
+  margin: 4px auto 0;
+  padding: 0 14px;
+}
+.list-divider hr {
+  border: none;
+  border-top: 1px dashed var(--border);
+  margin: 0;
 }
 
 /* Action buttons */
@@ -740,9 +838,20 @@ body {
 <nav class="controls" aria-label="Search and filters">
   <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff..." aria-label="Search restaurants">
   <div class="filters" id="filters" role="group" aria-label="Filter restaurants"></div>
+  <div class="global-controls">
+    <button type="button" id="globalStaffToggle" class="global-staff-toggle" aria-pressed="false" data-testid="global-staff-toggle">
+      <span id="globalStaffLabel">Show staff &amp; nicknames</span> <span class="staff-chevron">&#9662;</span>
+    </button>
+    <span class="pin-counter" id="pinCounter" data-testid="pin-counter" aria-live="polite"></span>
+  </div>
 </nav>
 
-<div class="cards" id="cards" role="list" aria-label="Restaurant cards"></div>
+<section class="pinned-section" id="pinnedSection" data-testid="pinned-section" aria-label="Pinned favorites" hidden>
+  <div class="pinned-label" id="pinnedLabel">Pinned Favorites</div>
+</section>
+<div class="cards" id="pinnedCards" role="list" aria-label="Pinned restaurants" data-testid="pinned-cards"></div>
+<div class="list-divider" id="listDivider" hidden><hr></div>
+<div class="cards" id="cards" role="list" aria-label="Restaurant cards" data-testid="all-cards"></div>
 
 <section class="try-next" id="tryNext" aria-label="Restaurant recommendations">
   <div class="try-next-header">
@@ -4309,20 +4418,160 @@ function ratingHTML(label, value) {
 }
 
 function staffHTML(staff) {
-  const count = staff.length;
   const rows = staff.map(([name, note]) =>
     `<div class="staff-row"><span class="staff-name">${name}</span>${note ? '<span class="staff-role">' + note + '</span>' : ''}</div>`
   ).join('');
-  return `<button class="staff-toggle" onclick="event.stopPropagation();this.classList.toggle('open')">${count} staff member${count !== 1 ? 's' : ''} <span class="staff-chevron">&#9662;</span></button><div class="staff-panel">${rows}</div>`;
+  return `<div class="staff-panel">${rows}</div>`;
 }
 
 let expandedIdx = null;
 
+// Persistence for staff visibility and pinned favorites
+const LS_STAFF = 'gvl.staffVisible';
+const LS_PINS = 'gvl.pinnedNames';
+const MAX_PINS = 5;
+
+function safeGet(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+function safeSet(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) {}
+}
+
+let staffVisible = safeGet(LS_STAFF) === '1';
+let pinnedNames = (() => {
+  try {
+    const raw = safeGet(LS_PINS);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(n => typeof n === 'string' && R.some(r => r.name === n)).slice(0, MAX_PINS);
+  } catch (e) { return []; }
+})();
+
+function savePins() {
+  safeSet(LS_PINS, JSON.stringify(pinnedNames));
+}
+
+function isPinned(name) { return pinnedNames.indexOf(name) !== -1; }
+
+function togglePin(name) {
+  const i = pinnedNames.indexOf(name);
+  if (i !== -1) {
+    pinnedNames.splice(i, 1);
+  } else {
+    if (pinnedNames.length >= MAX_PINS) return false;
+    pinnedNames.push(name);
+  }
+  savePins();
+  render();
+  return true;
+}
+
+function updateGlobalStaffToggleUI() {
+  const btn = document.getElementById('globalStaffToggle');
+  const label = document.getElementById('globalStaffLabel');
+  btn.classList.toggle('open', staffVisible);
+  btn.setAttribute('aria-pressed', String(staffVisible));
+  label.textContent = staffVisible ? 'Hide staff & nicknames' : 'Show staff & nicknames';
+}
+
+function updatePinCounter() {
+  const el = document.getElementById('pinCounter');
+  el.textContent = `${pinnedNames.length}/${MAX_PINS} pinned`;
+}
+
+document.getElementById('globalStaffToggle').addEventListener('click', () => {
+  staffVisible = !staffVisible;
+  safeSet(LS_STAFF, staffVisible ? '1' : '0');
+  updateGlobalStaffToggleUI();
+  render();
+});
+
+function cardHTML(r, opts) {
+  const idx = R.indexOf(r);
+  const exp = expandedIdx === idx;
+  const pinned = isPinned(r.name);
+  const limitReached = pinnedNames.length >= MAX_PINS && !pinned;
+  let cls = 'card';
+  if (exp) cls += ' expanded';
+  if (pinned) cls += ' pinned';
+  if (staffVisible) cls += ' staff-visible';
+
+  let badges = '';
+  if (r.michelin) badges += '<span class="badge badge-michelin">MICHELIN</span>';
+  if (r.wine) badges += '<span class="badge badge-wine">WINE SPECTATOR</span>';
+
+  let actions = '';
+  if (r.yelp) actions += `<a href="${r.yelp}" target="_blank" rel="noopener" class="action-btn btn-yelp">Yelp \u2192</a>`;
+  if (r.website) actions += `<a href="${r.website}" target="_blank" rel="noopener" class="action-btn btn-website">Website \u2192</a>`;
+  if (r.reservation) actions += `<a href="${r.reservation}" target="_blank" rel="noopener" class="action-btn btn-reserve">Reserve \u2192</a>`;
+  if (r.phone) actions += `<a href="tel:${r.phone}" class="action-btn btn-call">Call \u2192</a>`;
+  if (MENUS[r.name]) actions += `<button class="action-btn btn-menu" onclick="event.stopPropagation();openMenu(${idx})">Menu \u2192</button>`;
+
+  let detailLines = '';
+  if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
+  detailLines += `<div class="detail-line">\u23f0 ${r.hours}</div>`;
+  detailLines += `<div class="detail-line">\ud83e\ude91 ${r.reservationNote}</div>`;
+
+  const pinTitle = pinned
+    ? 'Unpin this restaurant'
+    : (limitReached ? `Pin limit reached (${MAX_PINS})` : 'Pin to favorites');
+  const pinAria = pinned ? `Unpin ${r.name}` : `Pin ${r.name} to favorites`;
+  const dataIdAttr = opts && opts.section ? `data-idx-${opts.section}="${idx}"` : `data-idx="${idx}"`;
+
+  return `<div class="${cls}" ${dataIdAttr} data-name="${r.name.replace(/"/g,'&quot;')}" role="listitem" data-testid="restaurant-card">
+    <div class="card-head" tabindex="0" role="button" aria-expanded="${exp}" onclick="toggle(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle(${idx})}">
+      <div class="card-head-main">
+        <div>
+          <span class="card-name">${r.name}</span>${badges ? '<span class="card-badges">'+badges+'</span>' : ''}
+        </div>
+        <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
+      </div>
+      <div class="card-right">
+        <button type="button" class="pin-btn${pinned ? ' pinned' : ''}" data-testid="pin-btn" aria-label="${pinAria}" aria-pressed="${pinned}" title="${pinTitle}" ${limitReached ? 'disabled' : ''} onclick="event.stopPropagation();togglePinByName(this.closest('[data-name]').getAttribute('data-name'))">${pinned ? '\u2605' : '\u2606'}</button>
+        <span class="chevron">\u25be</span>
+      </div>
+    </div>
+    <div class="card-staff-row" data-testid="staff-row">${staffHTML(r.staff)}</div>
+    <div class="card-body">
+      <div class="ratings-details">
+        <div class="info-panel">
+          <div class="section-label">Ratings</div>
+          ${ratingHTML('Google', r.google)}
+          ${ratingHTML('Yelp', r.yelpR)}
+          ${ratingHTML('TripAdvisor', r.tripadvisor)}
+        </div>
+        <div class="info-panel">
+          <div class="section-label">Details</div>
+          ${detailLines}
+        </div>
+      </div>
+      <div class="section-label">The Vibe</div>
+      <p class="vibe-text">${r.vibe}</p>
+      ${r.mustTry ? '<hr class="divider"><div class="section-label">Don\u2019t Miss</div><p class="must-try-text">'+r.mustTry+'</p>' : ''}
+      ${actions ? '<hr class="divider"><div class="actions">'+actions+'</div>' : ''}
+    </div>
+  </div>`;
+}
+
+function togglePinByName(name) {
+  const ok = togglePin(name);
+  if (!ok) {
+    const counter = document.getElementById('pinCounter');
+    counter.style.color = 'var(--michelin)';
+    setTimeout(() => { counter.style.color = ''; }, 1200);
+  }
+}
+
 function render() {
   const q = document.getElementById('search').value.toLowerCase();
-  const container = document.getElementById('cards');
-  
-  const filtered = R.filter((r, i) => {
+  const allCards = document.getElementById('cards');
+  const pinnedCards = document.getElementById('pinnedCards');
+  const pinnedSection = document.getElementById('pinnedSection');
+  const listDivider = document.getElementById('listDivider');
+
+  const filtered = R.filter(r => {
     const matchQ = !q || r.name.toLowerCase().includes(q) || r.cuisine.toLowerCase().includes(q) || r.staff.some(s => s[0].toLowerCase().includes(q) || (s[1]||'').toLowerCase().includes(q));
     const matchF = activeFilter === 'all'
       || (activeFilter === 'michelin' && r.michelin)
@@ -4338,61 +4587,29 @@ function render() {
     tryNextEl.style.display = (q || activeFilter !== 'all') ? 'none' : '';
   }
 
-  if (!filtered.length) { container.innerHTML = '<div class="no-results">No restaurants match your search.</div>'; return; }
+  // Pinned cards: keep user-defined order from pinnedNames, restricted to filtered set
+  const filteredNames = new Set(filtered.map(r => r.name));
+  const pinnedFiltered = pinnedNames
+    .filter(n => filteredNames.has(n))
+    .map(n => R.find(r => r.name === n));
 
-  container.innerHTML = filtered.map(r => {
-    const idx = R.indexOf(r);
-    const exp = expandedIdx === idx;
-    const cls = 'card' + (exp ? ' expanded' : '');
+  if (pinnedFiltered.length) {
+    pinnedSection.hidden = false;
+    pinnedCards.innerHTML = pinnedFiltered.map(r => cardHTML(r, { section: 'pinned' })).join('');
+    listDivider.hidden = false;
+  } else {
+    pinnedSection.hidden = true;
+    pinnedCards.innerHTML = '';
+    listDivider.hidden = true;
+  }
 
-    let badges = '';
-    if (r.michelin) badges += '<span class="badge badge-michelin">MICHELIN</span>';
-    if (r.wine) badges += '<span class="badge badge-wine">WINE SPECTATOR</span>';
+  if (!filtered.length) {
+    allCards.innerHTML = '<div class="no-results">No restaurants match your search.</div>';
+  } else {
+    allCards.innerHTML = filtered.map(r => cardHTML(r, { section: 'all' })).join('');
+  }
 
-    let actions = '';
-    if (r.yelp) actions += `<a href="${r.yelp}" target="_blank" rel="noopener" class="action-btn btn-yelp">Yelp \u2192</a>`;
-    if (r.website) actions += `<a href="${r.website}" target="_blank" rel="noopener" class="action-btn btn-website">Website \u2192</a>`;
-    if (r.reservation) actions += `<a href="${r.reservation}" target="_blank" rel="noopener" class="action-btn btn-reserve">Reserve \u2192</a>`;
-    if (r.phone) actions += `<a href="tel:${r.phone}" class="action-btn btn-call">Call \u2192</a>`;
-    if (MENUS[r.name]) actions += `<button class="action-btn btn-menu" onclick="event.stopPropagation();openMenu(${idx})">Menu \u2192</button>`;
-
-    let detailLines = '';
-    if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
-    detailLines += `<div class="detail-line">\u23f0 ${r.hours}</div>`;
-    detailLines += `<div class="detail-line">\ud83e\ude91 ${r.reservationNote}</div>`;
-
-    return `<div class="${cls}" data-idx="${idx}" role="listitem">
-      <div class="card-head" tabindex="0" role="button" aria-expanded="${exp}" onclick="toggle(${idx})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle(${idx})}">
-        <div>
-          <div class="card-name">${r.name}</div>
-          ${badges ? '<div class="card-badges">'+badges+'</div>' : ''}
-          <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
-          <div class="card-staff-row">${staffHTML(r.staff)}</div>
-        </div>
-        <div class="card-right">
-          <span class="chevron">\u25be</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="ratings-details">
-          <div class="info-panel">
-            <div class="section-label">Ratings</div>
-            ${ratingHTML('Google', r.google)}
-            ${ratingHTML('Yelp', r.yelpR)}
-            ${ratingHTML('TripAdvisor', r.tripadvisor)}
-          </div>
-          <div class="info-panel">
-            <div class="section-label">Details</div>
-            ${detailLines}
-          </div>
-        </div>
-        <div class="section-label">The Vibe</div>
-        <p class="vibe-text">${r.vibe}</p>
-        ${r.mustTry ? '<hr class="divider"><div class="section-label">Don\u2019t Miss</div><p class="must-try-text">'+r.mustTry+'</p>' : ''}
-        ${actions ? '<hr class="divider"><div class="actions">'+actions+'</div>' : ''}
-      </div>
-    </div>`;
-  }).join('');
+  updatePinCounter();
 }
 
 function toggle(idx) {
@@ -4400,12 +4617,13 @@ function toggle(idx) {
   render();
   if (expandedIdx !== null) {
     setTimeout(() => {
-      const el = document.querySelector(`[data-idx="${idx}"]`);
+      const el = document.querySelector(`[data-idx-all="${idx}"], [data-idx="${idx}"]`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
   }
 }
 
+updateGlobalStaffToggleUI();
 render();
 
 // Menu modal
