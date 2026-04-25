@@ -314,15 +314,32 @@ body {
   pointer-events: none;
 }
 
+/* Drag/reorder animation states */
+.card.reorder-animating {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
 .card.dragging {
-  opacity: 0.55;
-  box-shadow: 0 6px 18px rgba(26,46,64,0.2);
+  z-index: 50;
+  position: relative;
+  cursor: grabbing;
+  box-shadow: 0 12px 28px rgba(26,46,64,0.28), 0 4px 10px rgba(26,46,64,0.18);
+  background: var(--cream);
+  transition: box-shadow 160ms ease, transform 0s;
+  will-change: transform;
+  user-select: none;
 }
-.card.drop-target-above {
-  border-top: 2px solid var(--gold);
+.card.dragging .card-head {
+  cursor: grabbing;
 }
-.card.drop-target-below {
-  border-bottom: 2px solid var(--gold);
+body.reordering {
+  cursor: grabbing;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow-anchor: none;
+}
+body.reordering .card:not(.dragging) {
+  pointer-events: none;
 }
 
 /* Card body */
@@ -4508,7 +4525,10 @@ function moveByDelta(name, delta) {
   order.splice(from, 1);
   order.splice(to, 0, name);
   saveOrder();
+  // Capture positions before re-render for FLIP animation
+  const firstRects = captureCardRects();
   render();
+  flipAnimate(firstRects);
 }
 
 function cardHTML(r, opts) {
@@ -4663,16 +4683,51 @@ function toggle(idx) {
   }
 }
 
-// ----- Drag & drop reordering -----
+// ----- Drag & drop reordering with FLIP animation -----
 let dragState = null;
+const FLIP_DURATION = 220;
 
 function getCardEls() {
   return Array.from(document.querySelectorAll('#pinnedCards [data-testid="restaurant-card"], #cards [data-testid="restaurant-card"]'));
 }
 
-function clearDropMarkers() {
-  document.querySelectorAll('.drop-target-above, .drop-target-below').forEach(el => {
-    el.classList.remove('drop-target-above', 'drop-target-below');
+// Capture current card positions keyed by restaurant name
+function captureCardRects() {
+  const rects = new Map();
+  getCardEls().forEach(c => {
+    const name = c.getAttribute('data-name');
+    if (name) rects.set(name, c.getBoundingClientRect());
+  });
+  return rects;
+}
+
+// Run FLIP: for each currently rendered card, compute delta from old rect
+// and animate from old position to current position via inverse transform.
+function flipAnimate(firstRects, options) {
+  const opts = options || {};
+  const skipName = opts.skipName || null;
+  getCardEls().forEach(c => {
+    const name = c.getAttribute('data-name');
+    if (!name) return;
+    if (skipName && name === skipName) return;
+    const before = firstRects.get(name);
+    if (!before) return;
+    const after = c.getBoundingClientRect();
+    const dx = before.left - after.left;
+    const dy = before.top - after.top;
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+    // Apply inverse transform instantly, then animate to identity
+    c.style.transition = 'none';
+    c.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+    // Force reflow so the next style change animates
+    void c.offsetWidth;
+    c.classList.add('reorder-animating');
+    // Clear inline transition so the .reorder-animating CSS rule takes effect
+    c.style.transition = '';
+    c.style.transform = '';
+    setTimeout(() => {
+      c.classList.remove('reorder-animating');
+    }, FLIP_DURATION + 30);
   });
 }
 
@@ -4682,26 +4737,47 @@ function attachDragHandlers() {
   });
 }
 
+// During drag we keep the dragged card in the DOM at a moving index.
+// We translate it to follow the pointer, and reorder sibling DOM nodes
+// (without re-rendering) using FLIP for smooth slide animation.
 function onPointerDown(e) {
   if (e.button !== undefined && e.button !== 0) return;
+  if (dragState) return;
   const handle = e.currentTarget;
   const card = handle.closest('[data-testid="restaurant-card"]');
   if (!card) return;
   const name = card.getAttribute('data-name');
   e.preventDefault();
   try { handle.setPointerCapture(e.pointerId); } catch (err) {}
-  handle.classList.add('dragging');
-  card.classList.add('dragging');
+
+  const startRect = card.getBoundingClientRect();
+  // Tentative working order — mutated live during drag, committed on drop.
+  const workingOrder = order.slice();
+
   dragState = {
     name,
     pointerId: e.pointerId,
     handle,
     card,
+    startX: e.clientX,
+    startY: e.clientY,
+    startRect,
+    cardWidth: startRect.width,
+    cardHeight: startRect.height,
     moved: false,
-    targetName: null,
-    targetSide: null
+    workingOrder,
+    lastAutoScroll: 0,
+    rafScheduled: false,
+    pendingY: e.clientY,
+    pendingX: e.clientX
   };
-  document.body.style.userSelect = 'none';
+
+  handle.classList.add('dragging');
+  card.classList.add('dragging');
+  card.setAttribute('data-dragging', 'true');
+  document.body.classList.add('reordering');
+  document.body.setAttribute('data-reordering', 'true');
+
   handle.addEventListener('pointermove', onPointerMove);
   handle.addEventListener('pointerup', onPointerUp);
   handle.addEventListener('pointercancel', onPointerUp);
@@ -4710,70 +4786,171 @@ function onPointerDown(e) {
 function onPointerMove(e) {
   if (!dragState) return;
   dragState.moved = true;
-  const y = e.clientY;
-  const cards = getCardEls();
-  let target = null;
-  let side = null;
-  for (const c of cards) {
-    if (c === dragState.card) continue;
-    const rect = c.getBoundingClientRect();
-    if (y >= rect.top && y <= rect.bottom) {
-      target = c;
-      side = (y < rect.top + rect.height / 2) ? 'above' : 'below';
-      break;
-    }
+  dragState.pendingX = e.clientX;
+  dragState.pendingY = e.clientY;
+  if (!dragState.rafScheduled) {
+    dragState.rafScheduled = true;
+    requestAnimationFrame(processDragFrame);
   }
-  // edge cases: above first or below last
-  if (!target && cards.length) {
-    const first = cards[0];
-    const last = cards[cards.length - 1];
-    if (y < first.getBoundingClientRect().top) { target = first; side = 'above'; }
-    else if (y > last.getBoundingClientRect().bottom) { target = last; side = 'below'; }
-  }
-  clearDropMarkers();
-  if (target && target !== dragState.card) {
-    target.classList.add(side === 'above' ? 'drop-target-above' : 'drop-target-below');
-    dragState.targetName = target.getAttribute('data-name');
-    dragState.targetSide = side;
-  } else {
-    dragState.targetName = null;
-    dragState.targetSide = null;
+}
+
+function processDragFrame() {
+  if (!dragState) return;
+  dragState.rafScheduled = false;
+  const { card, startX, startY, pendingX, pendingY } = dragState;
+  const dx = pendingX - startX;
+  const dy = pendingY - startY;
+  // Move dragged card with pointer (slight scale for elevation feel)
+  card.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(1.02)`;
+
+  // Edge auto-scroll
+  const margin = 70;
+  const vh = window.innerHeight;
+  let scrollDelta = 0;
+  if (pendingY < margin) scrollDelta = -Math.min(14, (margin - pendingY) / 4);
+  else if (pendingY > vh - margin) scrollDelta = Math.min(14, (pendingY - (vh - margin)) / 4);
+  if (scrollDelta !== 0) {
+    window.scrollBy(0, scrollDelta);
   }
 
-  // edge auto-scroll
-  const margin = 60;
-  const vh = window.innerHeight;
-  if (y < margin) window.scrollBy(0, -8);
-  else if (y > vh - margin) window.scrollBy(0, 8);
+  // Determine which sibling the pointer center is over and reorder if needed.
+  // Loop in case the user dragged fast enough to pass multiple siblings between frames.
+  let safety = 20;
+  while (safety-- > 0 && maybeReorderDuringDrag(pendingY)) { /* repeat */ }
+}
+
+function maybeReorderDuringDrag(pointerY) {
+  const { name, card, workingOrder } = dragState;
+  const cards = getCardEls();
+  const draggedIdx = cards.indexOf(card);
+  if (draggedIdx === -1) return false;
+  const draggedRect = card.getBoundingClientRect();
+  const draggedMidY = draggedRect.top + draggedRect.height / 2;
+
+  let targetCard = null;
+  let insertBefore = false;
+
+  // Check sibling immediately above
+  if (draggedIdx > 0) {
+    const prev = cards[draggedIdx - 1];
+    const prevRect = prev.getBoundingClientRect();
+    const prevMidY = prevRect.top + prevRect.height / 2;
+    if (draggedMidY < prevMidY) {
+      targetCard = prev;
+      insertBefore = true;
+    }
+  }
+  // Check sibling immediately below
+  if (!targetCard && draggedIdx < cards.length - 1) {
+    const next = cards[draggedIdx + 1];
+    const nextRect = next.getBoundingClientRect();
+    const nextMidY = nextRect.top + nextRect.height / 2;
+    if (draggedMidY > nextMidY) {
+      targetCard = next;
+      insertBefore = false;
+    }
+  }
+
+  if (!targetCard) return false;
+
+  const targetName = targetCard.getAttribute('data-name');
+  if (targetName === name) return false;
+
+  // Capture positions BEFORE DOM reorder for FLIP
+  const firstRects = captureCardRects();
+
+  // Reorder DOM: move dragged card relative to target
+  reorderDomAndOrder(card, targetCard, insertBefore, workingOrder, name, targetName);
+
+  // Recompensate so dragged card stays visually under the finger.
+  // Read natural position (no transform), then apply translate to keep it where it was.
+  card.style.transition = 'none';
+  card.style.transform = '';
+  const naturalRect = card.getBoundingClientRect();
+  const adjDx = draggedRect.left - naturalRect.left;
+  const adjDy = draggedRect.top - naturalRect.top;
+  card.style.transform = `translate3d(${adjDx}px, ${adjDy}px, 0) scale(1.02)`;
+  // Re-anchor the start so subsequent pointer deltas chain correctly
+  dragState.startX = dragState.pendingX - adjDx;
+  dragState.startY = dragState.pendingY - adjDy;
+
+  // Animate the OTHER cards from old positions to new
+  flipAnimate(firstRects, { skipName: name });
+  return true;
+}
+
+// Move dragged DOM element into the correct slot relative to targetCard,
+// possibly across the pinned/all sections, and update workingOrder array.
+function reorderDomAndOrder(card, targetCard, insertBefore, workingOrder, name, targetName) {
+  const targetParent = targetCard.parentNode;
+  if (insertBefore) {
+    targetParent.insertBefore(card, targetCard);
+  } else {
+    targetParent.insertBefore(card, targetCard.nextSibling);
+  }
+  // Update working order array
+  const fromIdx = workingOrder.indexOf(name);
+  let toIdx = workingOrder.indexOf(targetName);
+  if (fromIdx === -1 || toIdx === -1) return;
+  workingOrder.splice(fromIdx, 1);
+  if (fromIdx < toIdx) toIdx -= 1;
+  if (!insertBefore) toIdx += 1;
+  if (toIdx < 0) toIdx = 0;
+  if (toIdx > workingOrder.length) toIdx = workingOrder.length;
+  workingOrder.splice(toIdx, 0, name);
+
+  // Update pinned class visually based on top-N in workingOrder
+  workingOrder.forEach((nm, i) => {
+    const el = document.querySelector(`[data-name="${nm.replace(/"/g,'&quot;')}"]`);
+    if (!el) return;
+    if (i < TOP_N) el.classList.add('pinned');
+    else el.classList.remove('pinned');
+  });
 }
 
 function onPointerUp(e) {
   if (!dragState) return;
-  const { name, handle, card, targetName, targetSide, moved } = dragState;
+  const { name, handle, card, workingOrder, moved } = dragState;
   try { handle.releasePointerCapture(dragState.pointerId); } catch (err) {}
   handle.removeEventListener('pointermove', onPointerMove);
   handle.removeEventListener('pointerup', onPointerUp);
   handle.removeEventListener('pointercancel', onPointerUp);
   handle.classList.remove('dragging');
-  card.classList.remove('dragging');
-  document.body.style.userSelect = '';
-  clearDropMarkers();
-  dragState = null;
 
-  if (!moved || !targetName || targetName === name) return;
-  // Compute new index in `order` based on target name and side
-  const fromIdx = order.indexOf(name);
-  let toIdx = order.indexOf(targetName);
-  if (fromIdx === -1 || toIdx === -1) return;
-  // Remove first
-  order.splice(fromIdx, 1);
-  if (fromIdx < toIdx) toIdx -= 1;
-  if (targetSide === 'below') toIdx += 1;
-  if (toIdx < 0) toIdx = 0;
-  if (toIdx > order.length) toIdx = order.length;
-  order.splice(toIdx, 0, name);
-  saveOrder();
-  render();
+  // Animate dragged card back to its slot
+  const targetRect = card.getBoundingClientRect();
+  // Strip current transform to find natural position
+  const currentTransform = card.style.transform;
+  card.style.transition = 'none';
+  card.style.transform = '';
+  const naturalRect = card.getBoundingClientRect();
+  const settleDx = targetRect.left - naturalRect.left;
+  const settleDy = targetRect.top - naturalRect.top;
+  card.style.transform = `translate3d(${settleDx}px, ${settleDy}px, 0) scale(1.02)`;
+  void card.offsetWidth;
+  card.style.transition = `transform ${FLIP_DURATION}ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 200ms ease`;
+  card.style.transform = 'translate3d(0, 0, 0) scale(1)';
+
+  const finalize = () => {
+    card.classList.remove('dragging');
+    card.removeAttribute('data-dragging');
+    card.style.transition = '';
+    card.style.transform = '';
+    document.body.classList.remove('reordering');
+    document.body.removeAttribute('data-reordering');
+    if (moved) {
+      order = workingOrder;
+      saveOrder();
+      // Re-render to ensure DOM matches data model exactly (especially section partitioning)
+      const firstRects = captureCardRects();
+      render();
+      flipAnimate(firstRects);
+      // Re-focus the handle on the moved card for keyboard continuity
+      refocusHandle(name);
+    }
+    dragState = null;
+  };
+  setTimeout(finalize, FLIP_DURATION + 10);
 }
 
 render();
