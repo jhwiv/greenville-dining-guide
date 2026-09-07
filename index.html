@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GVL Dining">
-<meta name="description" content="A personal dining guide to 18 restaurants in Greenville, SC — staff you know, menus, ratings, and MICHELIN recommendations.">
+<meta name="description" content="A personal dining guide to Greenville, SC restaurants — staff you know, menus, dish rankings, and MICHELIN recommendations.">
 <meta property="og:title" content="Greenville Dining Guide">
-<meta property="og:description" content="18 hand-picked restaurants in Greenville, SC with staff notes, in-app menus, ratings, and MICHELIN recommendations.">
+<meta property="og:description" content="Hand-picked Greenville, SC restaurants with staff notes, in-app menus, dish rankings, and MICHELIN recommendations.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://greenville-dining-guide.com">
 <meta name="twitter:card" content="summary">
@@ -839,6 +839,170 @@ body.reordering .card:not(.dragging) {
   line-height: 1.55;
   margin-top: 6px;
 }
+
+.badge-trip { background: #2a6f8f; }
+
+/* Menu ranking */
+.menu-toolbar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 10px 20px 0;
+  background: var(--cream);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.menu-tab {
+  background: var(--dark-cream);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.menu-tab.active {
+  background: var(--navy);
+  color: var(--gold);
+  border-color: var(--navy);
+}
+.menu-tab:focus-visible, .rank-btn:focus-visible, .menu-note-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.menu-item {
+  flex-wrap: wrap;
+}
+.menu-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+}
+.menu-item.rank-order { box-shadow: inset 3px 0 0 var(--green-good); padding-left: 10px; }
+.menu-item.rank-maybe { box-shadow: inset 3px 0 0 var(--amber); padding-left: 10px; }
+.menu-item.rank-skip { box-shadow: inset 3px 0 0 var(--red-low); padding-left: 10px; opacity: 0.72; }
+.menu-section-note {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--light);
+  margin: 6px 0 2px;
+}
+.rank-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+.rank-btn {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--med);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 7px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rank-btn.order.active { background: var(--green-good); border-color: var(--green-good); color: #fff; }
+.rank-btn.maybe.active { background: var(--amber); border-color: var(--amber); color: #fff; }
+.rank-btn.skip.active { background: var(--red-low); border-color: var(--red-low); color: #fff; }
+.menu-note-toggle {
+  background: none;
+  border: none;
+  color: var(--navy);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 6px 0 0;
+  cursor: pointer;
+}
+.menu-note-preview {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--med);
+  margin-top: 4px;
+}
+.menu-note-input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 16px;
+  background: var(--white);
+  color: var(--dark);
+  resize: vertical;
+  min-height: 44px;
+}
+.menu-empty, .picks-empty {
+  padding: 28px 20px;
+  text-align: center;
+  color: var(--med);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.menu-add-panel {
+  padding: 16px 20px 24px;
+}
+.menu-add-lead {
+  font-size: 15px;
+  color: var(--med);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.menu-file-btn, .menu-fixture-btn {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+}
+.menu-file-btn { background: var(--navy); color: var(--gold); }
+.menu-fixture-btn { background: var(--dark-cream); color: var(--navy); border: 1px solid var(--border); }
+.menu-file-input { display: none; }
+.menu-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--light);
+  margin-top: 8px;
+  line-height: 1.45;
+}
+.picks-group { padding: 14px 20px 6px; }
+.picks-group-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.card-picks-text { font-size: 15px; color: var(--dark); line-height: 1.55; }
 </style>
 </head>
 <body>
@@ -917,6 +1081,168 @@ body.reordering .card:not(.dragging) {
   </div>
 </div>
 
+<script type="application/json" id="ibfc-fixture">{
+  "restaurantName": "Island Fish Beach Company",
+  "sectionOrder": [
+    "Salads & Dips",
+    "Sandwiches",
+    "Pizza",
+    "Fried",
+    "Small Plates",
+    "Raw Bar",
+    "Sushi / Sashimi",
+    "Specialty Rolls",
+    "Sushi Apps",
+    "Sushi Rolls",
+    "Temaki Handrolls"
+  ],
+  "sectionNotes": [
+    {
+      "section": "Salads & Dips",
+      "note": "Add Chicken +$8 / Scallops +$12 / Shrimp +$10"
+    },
+    {
+      "section": "Sandwiches",
+      "note": "Served with choice of fries or fresh cut potato chips."
+    },
+    {
+      "section": "Raw Bar",
+      "note": "Ask your server about our oyster shooters."
+    }
+  ],
+  "sources": [
+    {
+      "filename": "ibfc-1-salads-sandwiches-pizza.jpeg",
+      "pageLabel": "Salads & Dips / Sandwiches / Pizza"
+    },
+    {
+      "filename": "ibfc-2-fried-small-raw.jpeg",
+      "pageLabel": "Fried / Small Plates / Raw Bar"
+    },
+    {
+      "filename": "ibfc-3-specialty-rolls.jpeg",
+      "pageLabel": "Sushi/Sashimi / Specialty Rolls"
+    },
+    {
+      "filename": "ibfc-4-sushi-apps-rolls.jpeg",
+      "pageLabel": "Apps / Sushi Rolls / Temaki"
+    }
+  ],
+  "extractionNotes": [
+    "Transcribed from Chip's four Island Fish Beach Company menu photos (QA fixture). Not generated by live AI.",
+    "UNVERIFIED vs a later reprint: photo 4's partially visible sushi/sashimi header showed different piece counts and prices than photo 3. Photo 3 is the source of truth for Sushi / Sashimi and Specialty Rolls.",
+    "UNVERIFIED: photo 3's bottom ROLLS column was cut off (prices $10 / $12 / $12 / $12 / $15). Names were not invented; regular rolls come from photo 4.",
+    "Names kept as printed, including Softty Po Boy, Sword Sandy, Margarita, Panseared, and Siracha tobiko."
+  ],
+  "items": [
+    {"name": "Smoked Fish Dip", "description": "Whitefish, mahi mahi, creamy mayo, spices and served with chips.", "priceText": "$16", "section": "Salads & Dips"},
+    {"name": "Chicken Mango Salad", "description": "Breaded chicken, mixed greens, carrots, tomatoes, hot sauce and mango vinaigrette.", "priceText": "$18", "section": "Salads & Dips"},
+    {"name": "Caesar Salad", "description": "Romaine lettuce, Caesar dressing, parmesan cheese.", "priceText": "$16", "section": "Salads & Dips"},
+    {"name": "House Salad", "description": "Mixed greens, onions, cucumbers, tomatoes, balsamic vinaigrette.", "priceText": "$14", "section": "Salads & Dips"},
+    {"name": "Pulled Pork", "description": "Tender shredded pork, topped with BBQ sauce, homemade slaw, hot pickles.", "priceText": "$14", "section": "Sandwiches"},
+    {"name": "Blackened Sword Sandy", "description": "Blackened swordfish L.T.O. with Cajun cream sauce.", "priceText": "$20", "section": "Sandwiches"},
+    {"name": "Island Dogs", "description": "Sweet BBQ and pineapple + mango relish and pickled onions.", "priceText": "$10", "section": "Sandwiches"},
+    {"name": "Fried Flounder Sandy", "description": "Lightly battered and fried, served with tartar sauce.", "priceText": "$18", "section": "Sandwiches"},
+    {"name": "Sausage Sandy", "description": "Sweet sausage butterflied and seared with sharp provolone and broccoli rabe.", "priceText": "$16", "section": "Sandwiches"},
+    {"name": "Smashed Burger", "description": "Butcher's blend topped with cheddar cheese and hot pickles. Single / double / triple. Add bacon, avocado, extra cheese, onions, or egg $2.", "priceText": "$14 / $18 / $20", "section": "Sandwiches"},
+    {"name": "Shrimp Po Boy", "description": "Lightly battered and fried, served with tartar sauce.", "priceText": "$18", "section": "Sandwiches"},
+    {"name": "Softty Po Boy", "description": "Lightly battered and fried, served with tartar sauce.", "priceText": "$22", "section": "Sandwiches"},
+    {"name": "Snow Crab Po Boy", "description": "Poached in butter and served on a roll.", "priceText": "$24", "section": "Sandwiches"},
+    {"name": "Plain Pizza", "description": "Traditional cheese pizza.", "priceText": "$12", "section": "Pizza"},
+    {"name": "White Pie", "description": "Ricotta, mozzarella, Parmesan cheese.", "priceText": "$14", "section": "Pizza"},
+    {"name": "BBQ Chicken", "description": "BBQ sauce with onions, a blend of cheddar and mozzarella cheese topped with more BBQ and chicken.", "priceText": "$18", "section": "Pizza"},
+    {"name": "Buffalo Chicken", "description": "Buffalo sauce with mozzarella cheese and Buffalo chicken and bleu cheese dressing.", "priceText": "$20", "section": "Pizza"},
+    {"name": "Margarita", "description": "Fresh mozzarella, jersey fresh tomatoes and fresh basil, with a sprinkle of Parmesan cheese.", "priceText": "$20", "section": "Pizza"},
+    {"name": "Cheeseburger Pie", "description": "Secret sauce with chopped burger bits, pickles, shredded lettuce, red onions, and sesame seed crust.", "priceText": "$22", "section": "Pizza"},
+    {"name": "IBFC Meat Lovers", "description": "Traditional pizza with sausage, pepperoni, bacon, chicken.", "priceText": "$22", "section": "Pizza"},
+    {"name": "Lobster & Goat Cheese", "description": "Garlic and ricotta, chunks of lobster meat, goat cheese and topped with hot honey.", "priceText": "$28", "section": "Pizza"},
+    {"name": "Pepperoni & Hot Honey", "description": "Traditional pie with Italian specialty pepperoni and drizzled with hot honey.", "priceText": "$22", "section": "Pizza"},
+    {"name": "Chicken Tender Basket", "description": "Savory and served with fries and house-made honey mustard.", "priceText": "$14", "section": "Fried"},
+    {"name": "Old Bay Chips", "description": "Crispy, fried and coated in Old Bay seasoning.", "priceText": "$8", "section": "Fried"},
+    {"name": "Shrimp Basket", "description": "Lightly battered and fried, served with fries and cocktail sauce.", "priceText": "$20", "section": "Fried"},
+    {"name": "Scallop Basket", "description": "Lightly battered and fried, served with fries and cocktail sauce.", "priceText": "$22", "section": "Fried"},
+    {"name": "Flounder Basket", "description": "Lightly battered and fried, served with fries and tartar sauce.", "priceText": "$20", "section": "Fried"},
+    {"name": "Mozz Sticks", "description": "Served with marinara.", "priceText": "$8", "section": "Small Plates"},
+    {"name": "Citrus Tuna", "description": "Mango and orange vinaigrette.", "priceText": "$20", "section": "Small Plates"},
+    {"name": "Blackened Scallops", "description": "Pan seared and topped with Cajun cream sauce.", "priceText": "$22", "section": "Small Plates"},
+    {"name": "Cajun Swordfish Bites", "description": "Topped with pineapple salsa.", "priceText": "$18", "section": "Small Plates"},
+    {"name": "Steamed Clams", "description": "Served in garlic and wine sauce.", "priceText": "$16", "section": "Small Plates"},
+    {"name": "Steamed Mussels", "description": "Sautéed in marinara.", "priceText": "$16", "section": "Small Plates"},
+    {"name": "Tuna Tataki", "description": "Served in ginger vinaigrette.", "priceText": "$20", "section": "Small Plates"},
+    {"name": "Panseared Scallops", "description": "Dayboat scallops in a raspberry beer sauce.", "priceText": "$20", "section": "Small Plates"},
+    {"name": "Shrimp Stir Fry", "description": "Sushi rice, vegetables, pineapple, teriyaki sauce.", "priceText": "$20", "section": "Small Plates"},
+    {"name": "Chicken Stir Fry", "description": "Sushi rice, vegetables, pineapple, teriyaki sauce.", "priceText": "$18", "section": "Small Plates"},
+    {"name": "IBFC Meatballs", "description": "Blend of veal, pork, beef, marinara and whipped ricotta cheese.", "priceText": "$16", "section": "Small Plates"},
+    {"name": "Wings", "description": "Brick oven fired with a choice of Scarpiello, Spicy Garlic Parm, General Tso, Buffalo, or BBQ.", "priceText": "$18", "section": "Small Plates"},
+    {"name": "Ceviche", "description": "White fish in lemon and lime juice with diced peppers, cucumbers, onions, cilantro, and jalapeño.", "priceText": "$20", "section": "Small Plates"},
+    {"name": "Bavarian Pretzel", "description": "Brick oven toasted with cheese and house-made honey mustard.", "priceText": "$12", "section": "Small Plates"},
+    {"name": "Buffalo Dumplings", "description": "Chicken dumplings fried and coated in buffalo sauce, served with blue cheese and celery.", "priceText": "$14", "section": "Small Plates"},
+    {"name": "Blackened Salmon Taco", "description": "Pickled slaw and Cajun crème.", "priceText": "$18", "section": "Small Plates"},
+    {"name": "Blue Points 6", "description": "", "priceText": "$14", "section": "Raw Bar"},
+    {"name": "Blue Points 12", "description": "", "priceText": "$28", "section": "Raw Bar"},
+    {"name": "Little Necks 6", "description": "", "priceText": "$8", "section": "Raw Bar"},
+    {"name": "Little Necks 12", "description": "", "priceText": "$14", "section": "Raw Bar"},
+    {"name": "Peel & Eat Shrimp", "description": "", "priceText": "$16", "section": "Raw Bar"},
+    {"name": "Jumbo Crab Cocktail", "description": "Served chilled, with cocktail sauce and lemon.", "priceText": "$20", "section": "Raw Bar"},
+    {"name": "Seafood Salad", "description": "", "priceText": "$18", "section": "Raw Bar"},
+    {"name": "Oyster of the Day", "description": "", "priceText": "MP", "section": "Raw Bar"},
+    {"name": "Crabstick Sushi (3pc)", "description": "", "priceText": "$7", "section": "Sushi / Sashimi"},
+    {"name": "Salmon Sushi (3pc)", "description": "", "priceText": "$9", "section": "Sushi / Sashimi"},
+    {"name": "Tuna (2pc)", "description": "Sushi.", "priceText": "$10", "section": "Sushi / Sashimi"},
+    {"name": "Yellowtail (2pc)", "description": "Sushi.", "priceText": "$11", "section": "Sushi / Sashimi"},
+    {"name": "BBQ Eel (2pc)", "description": "Sushi.", "priceText": "$11", "section": "Sushi / Sashimi"},
+    {"name": "Peppered Tuna (2pc)", "description": "Sushi.", "priceText": "$12", "section": "Sushi / Sashimi"},
+    {"name": "Sushi Dinner", "description": "5pc plus tuna roll.", "priceText": "$30", "section": "Sushi / Sashimi"},
+    {"name": "Crabstick Sashimi (3pc)", "description": "", "priceText": "$7", "section": "Sushi / Sashimi"},
+    {"name": "Salmon Sashimi (3pc)", "description": "", "priceText": "$9", "section": "Sushi / Sashimi"},
+    {"name": "Tuna Sashimi (3pc)", "description": "", "priceText": "$10", "section": "Sushi / Sashimi"},
+    {"name": "Yellowtail Sashimi (3pc)", "description": "", "priceText": "$11", "section": "Sushi / Sashimi"},
+    {"name": "BBQ Eel Sashimi (3pc)", "description": "", "priceText": "$11", "section": "Sushi / Sashimi"},
+    {"name": "Peppered Tuna Sashimi (3pc)", "description": "", "priceText": "$12", "section": "Sushi / Sashimi"},
+    {"name": "Firecracker Roll (8pc)", "description": "Shrimp tempura and cucumber topped with spicy crab salad, tobiko, spicy mayo and eel sauce.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Night Rider Roll (8pc)", "description": "Spicy tuna and avocado topped with peppered tuna and spicy mayo.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Sunset Roll (8pc)", "description": "Spicy salmon and avocado topped with spicy tuna, tempura flake and spicy mayo.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Christmas In July (8pc)", "description": "Shrimp tempura, cucumber and spicy mayo topped with tuna, avocado, tobiko and eel sauce.", "priceText": "$22", "section": "Specialty Rolls"},
+    {"name": "Midway Roll (8pc)", "description": "Shrimp tempura topped with spicy tuna, tempura flake and spicy mayo.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Mile Marker 0 Roll (8pc)", "description": "Shrimp tempura and pineapple topped with spicy crab salad, pineapple and eel sauce.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Green Dragon Roll (8pc)", "description": "Shrimp tempura, cucumber topped with avocado, BBQ eel, sesame seed and eel sauce.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Tsunami Roll (8pc)", "description": "Tuna, yellowtail, salmon topped with avocado and tobiko.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Surf & Turf Roll (8pc)", "description": "Shrimp tempura, spicy tuna, avocado topped with seared filet mignon and spicy mayo.", "priceText": "$24", "section": "Specialty Rolls"},
+    {"name": "Coconut Shrimp Roll", "description": "Coconut shrimp, avocado, and jalapeño, topped with spicy crab salad, coconut and tempura flakes and sweet Thai chili sauce.", "priceText": "$22", "section": "Specialty Rolls"},
+    {"name": "Boat Party", "description": "8pc sushi, 10pc sashimi, Firecracker Roll and Night Rider Roll.", "priceText": "$85", "section": "Specialty Rolls"},
+    {"name": "Electric Roll", "description": "BBQ eel and cucumber topped with avocado, eel sauce and siracha tobiko.", "priceText": "$21", "section": "Specialty Rolls"},
+    {"name": "Seaweed Salad", "description": "", "priceText": "$8", "section": "Sushi Apps"},
+    {"name": "Spicy Crab Salad", "description": "", "priceText": "$12", "section": "Sushi Apps"},
+    {"name": "Edamame Sea Salt", "description": "", "priceText": "$8", "section": "Sushi Apps"},
+    {"name": "Summer Truffle Edamame", "description": "", "priceText": "$10", "section": "Sushi Apps"},
+    {"name": "Vegetable Spring Rolls", "description": "", "priceText": "$12", "section": "Sushi Apps"},
+    {"name": "Shrimp Tempura App", "description": "", "priceText": "$15", "section": "Sushi Apps"},
+    {"name": "Fried Chicken Dumplings", "description": "", "priceText": "$15", "section": "Sushi Apps"},
+    {"name": "General Tso Dumpling", "description": "", "priceText": "$17", "section": "Sushi Apps"},
+    {"name": "Yellowtail Jalapeno Ponzu", "description": "", "priceText": "$16", "section": "Sushi Apps"},
+    {"name": "Tuna Nachos", "description": "Scoop of spicy tuna over fresh house-fried chips finished with jalapeño, sesame seed, tobiko, tempura flake, eel sauce and spicy mayo.", "priceText": "$20", "section": "Sushi Apps"},
+    {"name": "Tuna Poke Bowl", "description": "Sushi rice with edamame, seaweed salad, avocado, cucumber, pineapple, tobiko and sesame seeds, poke sauce and spicy mayo.", "priceText": "$20", "section": "Sushi Apps"},
+    {"name": "Crispy Rice", "description": "Spicy tuna over crispy sushi rice with jalapeño, sriracha, spicy mayo, eel sauce and tobiko.", "priceText": "$20", "section": "Sushi Apps"},
+    {"name": "Tartares", "description": "Tuna or salmon.", "priceText": "$17 / $18", "section": "Sushi Apps"},
+    {"name": "Sushi Pizza", "description": "Salmon sashimi, avocado, jalapeño, tobiko, sesame seed, spicy mayo, eel sauce on a crispy tortilla.", "priceText": "$22", "section": "Sushi Apps"},
+    {"name": "Avocado Roll (6pc)", "description": "", "priceText": "$7", "section": "Sushi Rolls"},
+    {"name": "Crabstick Roll (6pc)", "description": "", "priceText": "$8", "section": "Sushi Rolls"},
+    {"name": "Salmon Roll (6pc)", "description": "", "priceText": "$8", "section": "Sushi Rolls"},
+    {"name": "Tuna Roll (6pc)", "description": "", "priceText": "$10", "section": "Sushi Rolls"},
+    {"name": "California Roll (6pc)", "description": "Crabstick, cucumber and avocado.", "priceText": "$10", "section": "Sushi Rolls"},
+    {"name": "Alaskan Roll (6pc)", "description": "Salmon, cucumber and avocado.", "priceText": "$11", "section": "Sushi Rolls"},
+    {"name": "Philly Roll (6pc)", "description": "Salmon, cream cheese and cucumber.", "priceText": "$11", "section": "Sushi Rolls"},
+    {"name": "Spicy Tuna Roll (6pc)", "description": "Tempura flake.", "priceText": "$12", "section": "Sushi Rolls"},
+    {"name": "Shrimp Tempura Roll (5pc)", "description": "Cucumber and eel sauce.", "priceText": "$12", "section": "Sushi Rolls"},
+    {"name": "Yellowtail Scallion Roll (6pc)", "description": "", "priceText": "$12", "section": "Sushi Rolls"},
+    {"name": "Peppered Tuna Avocado Roll (6pc)", "description": "", "priceText": "$13", "section": "Sushi Rolls"},
+    {"name": "Salmon Temaki", "description": "Handroll.", "priceText": "$10", "section": "Temaki Handrolls"},
+    {"name": "Tuna Temaki", "description": "Handroll.", "priceText": "$12", "section": "Temaki Handrolls"},
+    {"name": "Spicy Crab Salad Temaki", "description": "Cooked. Handroll.", "priceText": "$12", "section": "Temaki Handrolls"},
+    {"name": "Yellowtail Temaki", "description": "Handroll.", "priceText": "$12", "section": "Temaki Handrolls"},
+    {"name": "Peppered Tuna & Avocado Temaki", "description": "Handroll.", "priceText": "$15", "section": "Temaki Handrolls"}
+  ]
+}</script>
 <script>
 const MENUS = {
   "The Jones Oyster Co.": [
@@ -4283,6 +4609,17 @@ const R = [
     staff: [["Teresa","curly dark hair"],["Darren",null],["Kyle","tall skinny"],["X","semi crabby behind bar"],["Jay","Urban Wren"],["Lisa","Greek makes the Soby\u2019s"],["Rem","metal detector"],["Fitz","new guy, bald, not Dan handsome"],["Gabriel","New level 1 Som"],["Mykala","bartender, round gen z glasses"]]
   },
   {
+    name: "Island Fish Beach Company", cuisine: "Seafood / Sushi / Pizza", address: "Beach trip (not Greenville)",
+    phone: null, phoneDisplay: null,
+    website: null, yelp: null,
+    reservation: null, reservationNote: "Walk-in",
+    google: null, yelpR: null, tripadvisor: null, price: "$$",
+    michelin: false, wine: false, hours: "Beach-trip hours",
+    vibe: "Beach-trip seafood, pizza, and sushi. Menu transcribed from Chip\u2019s photos as a ranking fixture \u2014 not a Greenville restaurant.",
+    mustTry: "Snow Crab Po Boy, Lobster & Goat Cheese pizza, Firecracker Roll, Tuna Nachos",
+    staff: []
+  },
+  {
     name: "Jianna", cuisine: "Modern Italian / Oyster Bar", address: "600 S Main St, 2nd Floor",
     phone: "8647202200", phoneDisplay: "(864) 720-2200",
     website: "https://jiannagreenville.com", yelp: "https://www.yelp.com/biz/jianna-greenville",
@@ -4438,6 +4775,7 @@ function ratingHTML(label, value) {
 }
 
 function staffHTML(staff) {
+  if (!staff || !staff.length) return '';
   const rows = staff.map(([name, note]) =>
     `<div class="staff-row"><span class="staff-name">${name}</span>${note ? '<span class="staff-role">' + note + '</span>' : ''}</div>`
   ).join('');
@@ -4509,6 +4847,136 @@ function moveByDelta(name, delta) {
   flipAnimate(firstRects);
 }
 
+
+const LS_RANKS = 'gvl.ranks';
+const LS_CUSTOM_MENUS = 'gvl.customMenus';
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function itemKey(section, name) {
+  return section + '|' + name;
+}
+
+function extractedToGuideMenu(extracted) {
+  if (!extracted || !Array.isArray(extracted.items)) return [];
+  const notes = {};
+  (extracted.sectionNotes || []).forEach(n => {
+    if (n && n.section) notes[n.section] = n.note || '';
+  });
+  const buckets = {};
+  extracted.items.forEach(it => {
+    const section = (it.section || 'Menu').trim() || 'Menu';
+    if (!buckets[section]) buckets[section] = [];
+    let price = (it.priceText || it.p || '').trim();
+    if (price.charAt(0) === '$') price = price.slice(1);
+    buckets[section].push({
+      n: it.name || it.n || '',
+      d: it.description || it.d || '',
+      p: price
+    });
+  });
+  const order = (extracted.sectionOrder || []).concat(Object.keys(buckets));
+  const seen = {};
+  const sections = [];
+  order.forEach(s => {
+    if (seen[s] || !buckets[s]) return;
+    seen[s] = true;
+    const sec = { s: s, items: buckets[s] };
+    if (notes[s]) sec.note = notes[s];
+    sections.push(sec);
+  });
+  return sections;
+}
+
+const IBFC_FIXTURE = (() => {
+  const el = document.getElementById('ibfc-fixture');
+  if (!el) return null;
+  try { return JSON.parse(el.textContent); } catch (e) { return null; }
+})();
+const IBFC_GUIDE_MENU = IBFC_FIXTURE ? extractedToGuideMenu(IBFC_FIXTURE) : [];
+if (IBFC_GUIDE_MENU.length) MENUS['Island Fish Beach Company'] = IBFC_GUIDE_MENU;
+
+let customMenus = (() => {
+  try {
+    const raw = safeGet(LS_CUSTOM_MENUS);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (e) { return {}; }
+})();
+
+let ranks = (() => {
+  try {
+    const raw = safeGet(LS_RANKS);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (e) { return {}; }
+})();
+
+function saveCustomMenus() {
+  safeSet(LS_CUSTOM_MENUS, JSON.stringify(customMenus));
+}
+function saveRanks() {
+  safeSet(LS_RANKS, JSON.stringify(ranks));
+}
+
+function getMenu(name) {
+  if (customMenus[name] && customMenus[name].length) return customMenus[name];
+  return MENUS[name] || null;
+}
+
+function getRestRanks(name) {
+  return ranks[name] || {};
+}
+
+function countRank(name, value) {
+  const map = getRestRanks(name);
+  let n = 0;
+  Object.keys(map).forEach(k => { if (map[k] && map[k].v === value) n++; });
+  return n;
+}
+
+function whatToOrderList(name) {
+  const menu = getMenu(name) || [];
+  const map = getRestRanks(name);
+  const order = [];
+  const maybe = [];
+  menu.forEach(sec => {
+    (sec.items || []).forEach(it => {
+      const rec = map[itemKey(sec.s, it.n)];
+      if (!rec) return;
+      const row = { sec: sec.s, it: it, note: rec.n || '' };
+      if (rec.v === 'order') order.push(row);
+      else if (rec.v === 'maybe') maybe.push(row);
+    });
+  });
+  return { order, maybe };
+}
+
+function setItemRank(name, key, value) {
+  if (!ranks[name]) ranks[name] = {};
+  const cur = ranks[name][key] || { v: null, n: '' };
+  if (cur.v === value) {
+    if (cur.n) ranks[name][key] = { v: null, n: cur.n };
+    else delete ranks[name][key];
+  } else {
+    ranks[name][key] = { v: value, n: cur.n || '' };
+  }
+  if (ranks[name][key] && !ranks[name][key].v && !ranks[name][key].n) delete ranks[name][key];
+  saveRanks();
+}
+
+function setItemNote(name, key, note) {
+  if (!ranks[name]) ranks[name] = {};
+  const cur = ranks[name][key] || { v: null, n: '' };
+  ranks[name][key] = { v: cur.v || null, n: note };
+  if (!ranks[name][key].v && !ranks[name][key].n) delete ranks[name][key];
+  saveRanks();
+}
+
 function cardHTML(r, opts) {
   const idx = R.indexOf(r);
   const exp = expandedIdx === idx;
@@ -4522,13 +4990,19 @@ function cardHTML(r, opts) {
   let badges = '';
   if (r.michelin) badges += '<span class="badge badge-michelin">MICHELIN</span>';
   if (r.wine) badges += '<span class="badge badge-wine">WINE SPECTATOR</span>';
+  if (r.name === 'Island Fish Beach Company') badges += '<span class="badge badge-trip">BEACH TRIP</span>';
 
   let actions = '';
   if (r.yelp) actions += `<a href="${r.yelp}" target="_blank" rel="noopener" class="action-btn btn-yelp">Yelp \u2192</a>`;
   if (r.website) actions += `<a href="${r.website}" target="_blank" rel="noopener" class="action-btn btn-website">Website \u2192</a>`;
   if (r.reservation) actions += `<a href="${r.reservation}" target="_blank" rel="noopener" class="action-btn btn-reserve">Reserve \u2192</a>`;
   if (r.phone) actions += `<a href="tel:${r.phone}" class="action-btn btn-call">Call \u2192</a>`;
-  if (MENUS[r.name]) actions += `<button class="action-btn btn-menu" onclick="event.stopPropagation();openMenu(${idx})">Menu \u2192</button>`;
+  const orderCount = countRank(r.name, 'order');
+  const hasMenu = !!getMenu(r.name);
+  const menuLabel = orderCount
+    ? 'Menu \u00b7 ' + orderCount + ' to order'
+    : (hasMenu ? 'Menu \u2192' : 'Add menu \u2192');
+  actions += `<button type="button" class="action-btn btn-menu" data-testid="open-menu" onclick="event.stopPropagation();openMenu(${idx})">${menuLabel}</button>`;
 
   let detailLines = '';
   if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
@@ -4545,9 +5019,7 @@ function cardHTML(r, opts) {
       <div class="card-head-main">
         <div class="name-row">
           <span class="card-name">${r.name}</span>${badges ? '<span class="card-badges">'+badges+'</span>' : ''}
-          <button type="button" class="staff-btn" data-testid="staff-toggle-btn" aria-pressed="${showStaff}" aria-label="${staffAria}" onclick="event.stopPropagation();toggleStaff(this.closest('[data-name]').getAttribute('data-name'))">
-            <span>Staff</span> <span class="staff-btn-chevron">\u25be</span>
-          </button>
+          ${r.staff && r.staff.length ? `<button type="button" class="staff-btn" data-testid="staff-toggle-btn" aria-pressed="${showStaff}" aria-label="${staffAria}" onclick="event.stopPropagation();toggleStaff(this.closest('[data-name]').getAttribute('data-name'))"><span>Staff</span> <span class="staff-btn-chevron">\u25be</span></button>` : ''}
         </div>
         <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
       </div>
@@ -4575,6 +5047,7 @@ function cardHTML(r, opts) {
       <div class="section-label">The Vibe</div>
       <p class="vibe-text">${r.vibe}</p>
       ${r.mustTry ? '<hr class="divider"><div class="section-label">Don\u2019t Miss</div><p class="must-try-text">'+r.mustTry+'</p>' : ''}
+      ${whatToOrderBlurb(r.name)}
       ${actions ? '<hr class="divider"><div class="actions">'+actions+'</div>' : ''}
     </div>
   </div>`;
@@ -4933,16 +5406,27 @@ function onPointerUp(e) {
 
 render();
 
+
+function whatToOrderBlurb(name) {
+  const picks = whatToOrderList(name).order;
+  if (!picks.length) return '';
+  const names = picks.map(p => escapeHtml(p.it.n)).join(', ');
+  return '<hr class="divider"><div class="section-label">What to order</div><p class="card-picks-text" data-testid="card-what-to-order">'+names+'</p>';
+}
+
 // Menu modal
+let menuIdx = null;
+let menuTab = 'menu';
+let menuNoteOpen = {};
+let menuStatus = '';
+let menuScroll = 0;
+let noteTimer = null;
+
 function normalizePrice(p) {
   if (!p) return '';
-  // Already formatted with $ or contains slash (multi-price like "18 / 33")
   if (p.includes('$')) return p;
-  // Pure number — add $
   if (/^\d+(\.\d+)?$/.test(p.trim())) return '$' + p.trim();
-  // Multi-price patterns like "Half Dozen 18 / Dozen 33" or "SM 12 / LG 18"
   return p.replace(/(\b)(\d+(\.\d+)?)(\b)/g, function(m, pre, num, dec, post) {
-    // Only add $ if not already preceded by $
     return pre + '$' + num + post;
   });
 }
@@ -4950,44 +5434,252 @@ function normalizePrice(p) {
 function openMenu(idx) {
   const rest = R[idx];
   if (!rest) return;
-  const menu = MENUS[rest.name];
-  if (!menu) return;
+  menuIdx = idx;
+  menuTab = 'menu';
+  menuNoteOpen = {};
+  menuStatus = '';
   document.getElementById('menuTitle').textContent = rest.name;
-  document.getElementById('menuCuisine').textContent = rest ? rest.cuisine + ' \u00b7 ' + rest.price : '';
-  const body = document.getElementById('menuBody');
+  document.getElementById('menuCuisine').textContent = rest.cuisine + ' \u00b7 ' + rest.price;
+  document.getElementById('menuOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderMenuModal(true);
+}
 
-  // Build section jump nav chips
+function setMenuTab(tab) {
+  menuTab = tab;
+  renderMenuModal(true);
+}
+
+function renderMenuModal(resetScroll) {
+  if (menuIdx == null) return;
+  const rest = R[menuIdx];
+  if (!rest) return;
+  const body = document.getElementById('menuBody');
+  if (!resetScroll) menuScroll = body.scrollTop;
+  const menu = getMenu(rest.name);
+  const picks = whatToOrderList(rest.name);
+  const orderN = picks.order.length;
+  const maybeN = picks.maybe.length;
+
+  const toolbar = `<div class="menu-toolbar" role="tablist" aria-label="Menu views">
+    <button type="button" class="menu-tab${menuTab==='menu'?' active':''}" data-testid="menu-tab-menu" onclick="setMenuTab('menu')">Menu</button>
+    <button type="button" class="menu-tab${menuTab==='picks'?' active':''}" data-testid="menu-tab-picks" onclick="setMenuTab('picks')">What to order${orderN+maybeN ? ' \u00b7 '+(orderN+maybeN) : ''}</button>
+    <button type="button" class="menu-tab${menuTab==='add'?' active':''}" data-testid="menu-tab-add" onclick="setMenuTab('add')">${menu ? 'Add / replace' : 'Add menu'}</button>
+  </div>`;
+
+  let inner = '';
+  if (menuTab === 'picks') inner = renderPicksView(rest.name, picks);
+  else if (menuTab === 'add') inner = renderAddMenuView(rest);
+  else inner = renderRankableMenu(rest.name, menu);
+
+  body.innerHTML = toolbar + inner;
+  body.scrollTop = resetScroll ? 0 : menuScroll;
+}
+
+function renderRankableMenu(name, menu) {
+  if (!menu || !menu.length) {
+    return `<div class="menu-empty" data-testid="menu-empty">No menu yet. Use <strong>Add menu</strong> to load the Island Fish fixture or upload photos.</div>`;
+  }
+  const map = getRestRanks(name);
   const navChips = menu.length > 2 ? '<div class="menu-nav">' + menu.map((sec, si) =>
-    `<button class="menu-nav-chip" onclick="document.getElementById('msec-${si}').scrollIntoView({behavior:'smooth',block:'start'})">${sec.s}</button>`
+    `<button type="button" class="menu-nav-chip" onclick="document.getElementById('msec-${si}').scrollIntoView({behavior:'smooth',block:'start'})">${escapeHtml(sec.s)}</button>`
   ).join('') + '</div>' : '';
 
   const sections = menu.map((sec, si) => {
-    const items = sec.items.map(it => {
+    const items = (sec.items || []).map(it => {
+      const key = itemKey(sec.s, it.n);
+      const rec = map[key] || {};
+      const rank = rec.v || '';
       const priceStr = normalizePrice(it.p);
-      return `<div class="menu-item">
-        <div class="menu-item-left">
-          <div class="menu-item-name">${it.n}</div>
-          ${it.d ? '<div class="menu-item-desc">' + it.d + '</div>' : ''}
+      const note = rec.n || '';
+      const noteOpen = !!menuNoteOpen[key];
+      return `<div class="menu-item${rank ? ' rank-'+rank : ''}" data-testid="menu-item" data-item-key="${escapeHtml(key)}">
+        <div class="menu-item-top">
+          <div class="menu-item-left">
+            <div class="menu-item-name">${escapeHtml(it.n)}</div>
+            ${it.d ? '<div class="menu-item-desc">' + escapeHtml(it.d) + '</div>' : ''}
+          </div>
+          ${priceStr ? '<div class="menu-item-price">' + escapeHtml(priceStr) + '</div>' : ''}
         </div>
-        ${priceStr ? '<div class="menu-item-price">' + priceStr + '</div>' : ''}
+        <div class="rank-row" role="group" aria-label="Rank ${escapeHtml(it.n)}">
+          <button type="button" class="rank-btn order${rank==='order'?' active':''}" aria-pressed="${rank==='order'}" data-testid="rank-order" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'order')">Order</button>
+          <button type="button" class="rank-btn maybe${rank==='maybe'?' active':''}" aria-pressed="${rank==='maybe'}" data-testid="rank-maybe" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'maybe')">Maybe</button>
+          <button type="button" class="rank-btn skip${rank==='skip'?' active':''}" aria-pressed="${rank==='skip'}" data-testid="rank-skip" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'skip')">Skip</button>
+        </div>
+        ${rank || note ? `<button type="button" class="menu-note-toggle" onclick="toggleMenuNote(decodeURIComponent('${encodeURIComponent(key)}'))">${noteOpen ? 'Hide note' : (note ? 'Edit note' : 'Add note')}</button>` : ''}
+        ${!noteOpen && note ? '<div class="menu-note-preview">'+escapeHtml(note)+'</div>' : ''}
+        ${noteOpen ? `<textarea class="menu-note-input" data-testid="menu-note" rows="2" placeholder="Why this ranking?" oninput="queueItemNote(decodeURIComponent('${encodeURIComponent(key)}'), this.value)" onblur="commitItemNote(decodeURIComponent('${encodeURIComponent(key)}'), this.value)">${escapeHtml(note)}</textarea>` : ''}
       </div>`;
     }).join('');
     return `<div class="menu-section" id="msec-${si}">
-      <div class="menu-section-name">${sec.s}</div>
+      <div class="menu-section-name">${escapeHtml(sec.s)}</div>
+      ${sec.note ? '<div class="menu-section-note">'+escapeHtml(sec.note)+'</div>' : ''}
       ${items}
     </div>`;
   }).join('');
 
-  body.innerHTML = navChips + sections;
-  body.scrollTop = 0;
-  document.getElementById('menuOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  return navChips + sections;
 }
+
+function renderPicksView(name, picks) {
+  if (!picks.order.length && !picks.maybe.length) {
+    return `<div class="picks-empty" data-testid="picks-empty">Nothing ranked yet. Open <strong>Menu</strong> and tap Order or Maybe. Skip stays off this list.</div>`;
+  }
+  const block = (label, rows, testid) => {
+    if (!rows.length) return '';
+    const items = rows.map(row => {
+      const priceStr = normalizePrice(row.it.p);
+      return `<div class="menu-item" data-testid="${testid}-item">
+        <div class="menu-item-top">
+          <div class="menu-item-left">
+            <div class="menu-item-name">${escapeHtml(row.it.n)}</div>
+            <div class="menu-item-desc">${escapeHtml(row.sec)}${row.it.d ? ' \u00b7 ' + escapeHtml(row.it.d) : ''}</div>
+            ${row.note ? '<div class="menu-note-preview">'+escapeHtml(row.note)+'</div>' : ''}
+          </div>
+          ${priceStr ? '<div class="menu-item-price">' + escapeHtml(priceStr) + '</div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="picks-group"><div class="picks-group-name">${label}</div>${items}</div>`;
+  };
+  return `<div data-testid="what-to-order">${block('Order', picks.order, 'picks-order')}${block('Maybe', picks.maybe, 'picks-maybe')}</div>`;
+}
+
+function renderAddMenuView(rest) {
+  const hasMenu = !!getMenu(rest.name);
+  return `<div class="menu-add-panel" data-testid="menu-add-panel">
+    <p class="menu-add-lead">${hasMenu
+      ? 'Replace this menu from Chip\u2019s Island Fish fixture, or upload photos / a PDF. Live extract needs an API key on deploy; the fixture path does not.'
+      : 'No baked-in menu yet. Load the Island Fish Beach Company fixture (no key), or upload photos / a PDF to extract items.'}</p>
+    <button type="button" class="menu-fixture-btn" data-testid="load-fixture" onclick="loadIbfcFixture()">Load Island Fish fixture</button>
+    <label class="menu-file-btn">Upload photos or PDF
+      <input class="menu-file-input" data-testid="menu-upload" type="file" accept="image/*,application/pdf" multiple onchange="uploadMenuFiles(this.files)">
+    </label>
+    <div class="menu-status" data-testid="menu-status">${escapeHtml(menuStatus)}</div>
+  </div>`;
+}
+
+function toggleRank(key, value) {
+  if (menuIdx == null) return;
+  const name = R[menuIdx].name;
+  setItemRank(name, key, value);
+  renderMenuModal(false);
+}
+
+function toggleMenuNote(key) {
+  menuNoteOpen[key] = !menuNoteOpen[key];
+  renderMenuModal(false);
+  if (menuNoteOpen[key]) {
+    setTimeout(() => {
+      const el = document.querySelector('.menu-note-input');
+      if (el) el.focus();
+    }, 0);
+  }
+}
+
+function queueItemNote(key, value) {
+  if (noteTimer) clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => commitItemNote(key, value), 250);
+}
+
+function commitItemNote(key, value) {
+  if (menuIdx == null) return;
+  if (noteTimer) { clearTimeout(noteTimer); noteTimer = null; }
+  setItemNote(R[menuIdx].name, key, value);
+}
+
+function loadIbfcFixture() {
+  if (menuIdx == null) return;
+  if (!IBFC_GUIDE_MENU.length) {
+    menuStatus = 'Fixture is missing from this build.';
+    renderMenuModal(false);
+    return;
+  }
+  const name = R[menuIdx].name;
+  customMenus[name] = IBFC_GUIDE_MENU;
+  saveCustomMenus();
+  menuStatus = 'Loaded Island Fish Beach Company fixture (' + IBFC_GUIDE_MENU.reduce((n,s)=>n+(s.items||[]).length,0) + ' items). Rankings for matching names are kept.';
+  menuTab = 'menu';
+  renderMenuModal(true);
+}
+
+async function fileToExtractPayload(file) {
+  let send = file;
+  if (file.type.indexOf('image/') === 0 && typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(file);
+      const max = 1600;
+      const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+      if (scale < 1 || file.size > 1200000) {
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+          const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.82));
+          if (blob) send = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+        }
+      }
+      bitmap.close();
+    } catch (e) { /* use original */ }
+  }
+  const buffer = await send.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return { filename: file.name, mimeType: send.type || file.type || 'application/octet-stream', base64: btoa(binary) };
+}
+
+async function uploadMenuFiles(fileList) {
+  if (menuIdx == null) return;
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  const rest = R[menuIdx];
+  menuStatus = 'Uploading ' + files.length + ' file' + (files.length>1?'s':'') + '\u2026';
+  renderMenuModal(false);
+  try {
+    const payload = {
+      restaurantName: rest.name,
+      files: await Promise.all(files.map(fileToExtractPayload))
+    };
+    const response = await fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    let data = null;
+    try { data = await response.json(); } catch (e) { data = null; }
+    if (response.ok && data && Array.isArray(data.items) && data.items.length) {
+      customMenus[rest.name] = extractedToGuideMenu(data);
+      saveCustomMenus();
+      menuStatus = 'Extracted ' + data.items.length + ' items. UNVERIFIED live extract \u2014 check names and prices against the photo.';
+      menuTab = 'menu';
+      renderMenuModal(true);
+      return;
+    }
+    const msg = (data && data.message) ? data.message : (response.status === 404
+      ? 'No extract endpoint on this host.'
+      : 'Extract is unavailable.');
+    menuStatus = msg + ' Load the Island Fish fixture instead \u2014 no API key required.';
+    renderMenuModal(false);
+  } catch (err) {
+    menuStatus = 'Could not reach /api/extract. Load the Island Fish fixture to demo without a key.';
+    renderMenuModal(false);
+  }
+}
+
 function closeMenu() {
+  menuIdx = null;
   document.getElementById('menuOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  render();
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
 </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "name": "Greenville Dining Guide",
   "short_name": "GVL Dining",
-  "description": "Your personal guide to 17 restaurants in Greenville, SC",
+  "description": "Personal Greenville dining guide — staff, menus, and dish rankings",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a2e40",
