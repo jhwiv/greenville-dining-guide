@@ -933,7 +933,7 @@ body.reordering .card:not(.dragging) {
   min-height: 40px;
   font-size: 22px;
   line-height: 1;
-  color: #ddd6c0;
+  color: #c4b99a;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -946,11 +946,10 @@ body.reordering .card:not(.dragging) {
   margin-top: 4px;
 }
 .star-icon {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1;
-  color: #ddd6c0;
+  color: var(--gold);
 }
-.star-icon.on { color: var(--gold); }
 .menu-note-toggle {
   background: none;
   border: none;
@@ -5357,15 +5356,15 @@ function starControlHTML(dishName, key, stars) {
     const on = stars >= n;
     const pressed = stars === n;
     const extra = pressed ? ', selected. Tap again to clear' : '';
-    return `<button type="button" class="star-btn${on ? ' on' : ''}" data-testid="star-${n}" role="radio" aria-label="${n} star${n === 1 ? '' : 's'}${extra}" aria-checked="${pressed}" onclick="setMenuStars(decodeURIComponent('${enc}'),${n})">\u2605</button>`;
+    return `<button type="button" class="star-btn${on ? ' on' : ''}" data-testid="star-${n}" role="radio" aria-label="${n} star${n === 1 ? '' : 's'}${extra}" aria-checked="${pressed}" onclick="setMenuStars(decodeURIComponent('${enc}'),${n})">${on ? '\u2605' : '\u2606'}</button>`;
   }).join('');
   return `<div class="star-row" role="radiogroup" aria-label="Star rating for ${escapeHtml(dishName)}" data-testid="dish-stars">${buttons}</div>`;
 }
 
 function starReadoutHTML(stars) {
   if (!stars) return '';
-  const icons = [1, 2, 3, 4, 5].map(n =>
-    `<span class="star-icon${stars >= n ? ' on' : ''}" aria-hidden="true">\u2605</span>`
+  const icons = Array.from({ length: stars }, () =>
+    '<span class="star-icon on" aria-hidden="true">\u2605</span>'
   ).join('');
   return `<div class="star-readout" aria-label="${stars} star${stars === 1 ? '' : 's'}">${icons}</div>`;
 }
