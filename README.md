@@ -1,6 +1,6 @@
 # Greenville Dining Guide
 
-Personal dining guide for restaurants Chip actually uses in Greenville, SC: staff you know, baked-in menus, ratings, and now **per-dish rankings**.
+Personal dining guide for restaurants Chip actually uses in Greenville, SC: staff you know, baked-in menus, ratings, and **per-dish rankings**.
 
 This is a static site (`index.html`). Rankings and any uploaded/replaced menus live in the browser (`localStorage`). There is no app backend.
 
@@ -12,30 +12,27 @@ Any static server from the repo root works:
 python3 -m http.server 4173
 ```
 
-Open `http://localhost:4173`. Opening `index.html` as a `file://` URL also works for the fixture/ranking path.
+Open `http://localhost:4173`. Opening `index.html` as a `file://` URL also works for baked-in menus and ranking.
 
-## Demo: menu + dish ranking
+## Demo: menu + dish ranking (Greenville)
 
-Island Fish Beach Company is included as a **beach-trip** card (not a Greenville restaurant) with Chip’s four menu photos already transcribed. **No API key.**
+Ranking lives on the restaurants already in this guide — not a beach-trip card. **No API key.**
 
-1. Search **Island Fish** (or scroll — it sits with the restaurant cards and has a BEACH TRIP badge).
-2. Expand the card. Staff is omitted (none recorded). Tap **Menu →**.
-3. Confirm sections from Salads & Dips through Temaki, with jump chips.
-4. Rank a few dishes **Order / Maybe / Skip**. Add an optional note on a ranked item.
-5. Open **What to order**. Order items appear first, then Maybe. Skip and unranked stay off this list.
+1. Open the app. Greenville restaurants and staff still show. Search **Todd** or **Soby** to confirm staff search.
+2. Search **Soby**. Expand **Soby’s New South Cuisine**. Tap **Menu →**.
+3. Confirm baked-in sections (Southern Taste, Soups & Salads, Sides, Entrees, …) with jump chips.
+4. Rank **Fried Green Tomatoes** Order, **Crab Cakes** Maybe, **Seasonal Vegetable Plate** Skip. Add an optional note on the tomatoes.
+5. Open **What to order**. Fried Green Tomatoes first, then Crab Cakes. The skip stays off this list.
 6. Close the menu. The card’s **What to order** line and the Menu button count should match.
-7. Refresh. Reopen Island Fish — rankings and notes should still be there.
+7. Refresh. Reopen Soby’s — rankings and notes should still be there.
 
-Restaurants that already had in-app menus (Jones, Soby’s, Coral, …) get the same ranking controls. Cork & Cleaver and South Main Social still have no baked-in menu: expand the card → **Add menu →** → **Load Island Fish fixture** or upload photos/PDF.
+The same Order / Maybe / Skip controls are on every Greenville restaurant in the guide, including newly embedded **Cork & Cleaver** (official PDF) and **South Main Social** (official site — names only, no published prices).
 
-Photo map used for the fixture (same as the standalone Menu Rank experiment):
+Places without a stable public menu stay as they were: BrickTop’s (no good GVL priced HTML), Curean (rotating), Topsoil (prix fixe only). DeMarco’s prices were not re-verified. Live extract remains optional and **UNVERIFIED**.
 
-1. Salads & Dips / Sandwiches / Pizza
-2. Fried / Small Plates / Raw Bar
-3. Sushi/Sashimi / Specialty Rolls
-4. Apps / Sushi Rolls / Temaki
+## Optional QA fixture (not a restaurant)
 
-The JSON lives at [`fixtures/island-fish-beach-company.json`](fixtures/island-fish-beach-company.json) and is also embedded in `index.html` so the demo works offline.
+[`fixtures/island-fish-beach-company.json`](fixtures/island-fish-beach-company.json) is an extract-format sample from Chip’s Island Fish photos. It is **not** a Greenville restaurant and is **not** shown as a card. Keep it only if you need a labeled JSON shape for upload/extract testing.
 
 ## Optional live extract
 
@@ -43,7 +40,7 @@ Upload on **Add / replace** will `POST /api/extract` when that endpoint exists.
 
 | Mode | When |
 | --- | --- |
-| **Fixture / baked-in menus (required)** | Always available. No key. |
+| **Baked-in Greenville menus (required)** | Always available. No key. Rank dishes immediately. |
 | **Live AI (optional)** | Cloudflare Pages Function at [`functions/api/extract.js`](functions/api/extract.js) if `ANTHROPIC_API_KEY` is set. |
 
 Treat any live extract as a draft. Vision models misread prices and skip lines.
@@ -58,7 +55,7 @@ If you publish with **Cloudflare Pages** (no build command; output is the repo r
 2. To enable live extract, add a Pages secret named `ANTHROPIC_API_KEY`. The Function under `functions/api/extract.js` is picked up automatically.
 3. Custom domains that need Chip’s DNS stay out of scope here.
 
-No new deploy is required to try rankings or the Island Fish fixture on a local static server.
+No new deploy is required to try rankings on a local static server.
 
 ## Persistence
 
@@ -66,6 +63,6 @@ No new deploy is required to try rankings or the Island Fish fixture on a local 
 | --- | --- |
 | `gvl.order` | Existing drag-to-reorder / top-five favorites |
 | `gvl.ranks` | Per-restaurant dish ranks (`order` / `maybe` / `skip`) and notes |
-| `gvl.customMenus` | Menus loaded from the fixture or a live extract (overrides the baked-in menu for that restaurant) |
+| `gvl.customMenus` | Menus from a live extract (overrides the baked-in menu for that restaurant) |
 
-Clearing site data resets rankings and custom menus. Baked-in Greenville menus and the Island Fish fixture remain in the page.
+Clearing site data resets rankings and custom menus. Baked-in Greenville menus remain in the page.

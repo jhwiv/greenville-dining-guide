@@ -1,7 +1,7 @@
 /**
  * Optional live menu extract for Cloudflare Pages.
- * Requires an ANTHROPIC_API_KEY Pages secret. The Island Fish fixture
- * and baked-in Greenville menus work without this endpoint.
+ * Requires an ANTHROPIC_API_KEY Pages secret. Baked-in Greenville
+ * menus and dish ranking work without this endpoint.
  */
 
 const MODEL = "claude-sonnet-4-6";
@@ -81,7 +81,7 @@ async function handleExtract(request, env) {
       {
         error: "no_api_key",
         message:
-          "Live extract needs ANTHROPIC_API_KEY. Load the Island Fish fixture or use a baked-in menu — no key required.",
+          "Live extract needs ANTHROPIC_API_KEY. Use a baked-in Greenville menu to rank dishes — no key required.",
         unverified: true,
       },
       501,
