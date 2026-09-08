@@ -188,6 +188,35 @@ body {
   gap: 4px;
   flex-shrink: 0;
 }
+
+/* Menu control beside the restaurant name (card header) */
+.head-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--navy);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+.head-menu-btn:hover, .head-menu-btn:focus-visible {
+  background: #243d55;
+}
+.head-menu-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
 .card-staff-row {
   display: none;
   padding: 0 12px 10px;
@@ -247,7 +276,7 @@ body {
   transform: rotate(180deg);
 }
 
-/* Drag handle (hamburger) on card */
+/* Drag handle (grip) on card — not a menu icon */
 .drag-handle {
   background: none;
   border: 1px solid var(--border);
@@ -521,8 +550,13 @@ body.reordering .card:not(.dragging) {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   text-decoration: none;
+  cursor: pointer;
   transition: opacity 0.15s;
   -webkit-tap-highlight-color: transparent;
+}
+button.action-btn {
+  appearance: none;
+  -webkit-appearance: none;
 }
 .action-btn:active { opacity: 0.8; }
 @media (max-width: 480px) {
@@ -1050,7 +1084,7 @@ body.reordering .card:not(.dragging) {
 <nav class="controls" aria-label="Search">
   <input class="search-input" type="text" id="search" placeholder="Search by name, cuisine, or staff..." aria-label="Search restaurants">
   <div class="global-controls">
-    <span class="reorder-hint" data-testid="reorder-hint">Drag &#9776; to reorder &middot; top 5 are your favorites</span>
+    <span class="reorder-hint" data-testid="reorder-hint">Tap Menu for dishes &middot; drag the grip to reorder &middot; top 5 are your favorites</span>
   </div>
 </nav>
 
@@ -5393,7 +5427,7 @@ function cardHTML(r, opts) {
   const menuLabel = orderCount
     ? 'Menu \u00b7 ' + orderCount + ' to order'
     : (hasMenu ? 'Menu \u2192' : 'Add menu \u2192');
-  actions += `<button type="button" class="action-btn btn-menu" data-testid="open-menu" onclick="event.stopPropagation();openMenu(${idx})">${menuLabel}</button>`;
+  actions += `<button type="button" class="action-btn btn-menu" data-testid="open-menu-actions" onclick="onOpenMenuClick(event)">${menuLabel}</button>`;
 
   let detailLines = '';
   if (r.phoneDisplay) detailLines += `<div class="detail-line">\u260e ${r.phoneDisplay}</div>`;
@@ -5415,8 +5449,9 @@ function cardHTML(r, opts) {
         <div class="card-meta">${r.cuisine} \u00b7 ${r.price} \u00b7 ${r.address}</div>
       </div>
       <div class="card-right">
+        <button type="button" class="head-menu-btn" data-testid="open-menu" aria-label="Open menu for ${escapeHtml(r.name)}" title="Open menu" onclick="onOpenMenuClick(event)" onkeydown="event.stopPropagation()" onpointerdown="event.stopPropagation()">Menu</button>
         <button type="button" class="drag-handle" data-testid="drag-handle" aria-label="${dragAria}" title="Drag to reorder. First 5 are your favorites." onclick="event.stopPropagation()" onkeydown="handleHandleKey(event, this.closest('[data-name]').getAttribute('data-name'))">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="5" cy="3.5" r="1.45" fill="currentColor"/><circle cx="11" cy="3.5" r="1.45" fill="currentColor"/><circle cx="5" cy="8" r="1.45" fill="currentColor"/><circle cx="11" cy="8" r="1.45" fill="currentColor"/><circle cx="5" cy="12.5" r="1.45" fill="currentColor"/><circle cx="11" cy="12.5" r="1.45" fill="currentColor"/></svg>
         </button>
         <span class="chevron">\u25be</span>
       </div>
@@ -5820,6 +5855,22 @@ function normalizePrice(p) {
   return p.replace(/(\b)(\d+(\.\d+)?)(\b)/g, function(m, pre, num, dec, post) {
     return pre + '$' + num + post;
   });
+}
+
+function onOpenMenuClick(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const card = event && event.currentTarget && event.currentTarget.closest('[data-name]');
+  if (!card) return;
+  openMenuByName(card.getAttribute('data-name'));
+}
+
+function openMenuByName(name) {
+  const idx = R.findIndex(r => r.name === name);
+  if (idx < 0) return;
+  openMenu(idx);
 }
 
 function openMenu(idx) {

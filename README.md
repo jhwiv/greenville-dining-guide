@@ -19,7 +19,7 @@ Open `http://localhost:4173`. Opening `index.html` as a `file://` URL also works
 Ranking lives on the restaurants already in this guide — not a beach-trip card. **No API key.**
 
 1. Open the app. Greenville restaurants and staff still show. Search **Todd** or **Soby** to confirm staff search.
-2. Search **Soby**. Expand **Soby’s New South Cuisine**. Tap **Menu →**.
+2. Search **Soby**. Tap **Menu** beside the restaurant name (no need to expand the card).
 3. Confirm baked-in sections (Southern Taste, Soups & Salads, Sides, Entrees, …) with jump chips.
 4. Rank **Fried Green Tomatoes** Order, tap **5 stars**, then **Add comment** and type a short note. Rank **Crab Cakes** Maybe with **3 stars**. Rank **Seasonal Vegetable Plate** Skip.
 5. Open **What to order**. Fried Green Tomatoes first (with stars + comment), then Crab Cakes. The skip stays off this list.
