@@ -871,7 +871,7 @@ body.reordering .card:not(.dragging) {
   color: var(--gold);
   border-color: var(--navy);
 }
-.menu-tab:focus-visible, .rank-btn:focus-visible, .menu-note-toggle:focus-visible {
+.menu-tab:focus-visible, .rank-btn:focus-visible, .menu-note-toggle:focus-visible, .star-btn:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
@@ -918,6 +918,39 @@ body.reordering .card:not(.dragging) {
 .rank-btn.order.active { background: var(--green-good); border-color: var(--green-good); color: #fff; }
 .rank-btn.maybe.active { background: var(--amber); border-color: var(--amber); color: #fff; }
 .rank-btn.skip.active { background: var(--red-low); border-color: var(--red-low); color: #fff; }
+.star-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  margin-top: 6px;
+}
+.star-btn {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 22px;
+  line-height: 1;
+  color: #ddd6c0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.star-btn:first-child { padding-left: 0; }
+.star-btn.on { color: var(--gold); }
+.star-readout {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-top: 4px;
+}
+.star-icon {
+  font-size: 14px;
+  line-height: 1;
+  color: #ddd6c0;
+}
+.star-icon.on { color: var(--gold); }
 .menu-note-toggle {
   background: none;
   border: none;
@@ -928,6 +961,9 @@ body.reordering .card:not(.dragging) {
   text-transform: uppercase;
   padding: 6px 0 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  text-align: left;
 }
 .menu-note-preview {
   font-size: 13px;
@@ -5250,6 +5286,28 @@ function getRestRanks(name) {
   return ranks[name] || {};
 }
 
+function normalizeStars(s) {
+  const n = Number(s);
+  return n >= 1 && n <= 5 && n === Math.floor(n) ? n : null;
+}
+
+function getItemRec(name, key) {
+  const raw = (ranks[name] || {})[key] || {};
+  return { v: raw.v || null, n: raw.n || '', s: normalizeStars(raw.s) };
+}
+
+function putItemRec(name, key, rec) {
+  if (!ranks[name]) ranks[name] = {};
+  const next = { v: rec.v || null, n: rec.n || '', s: normalizeStars(rec.s) };
+  if (!next.v && !next.n && !next.s) delete ranks[name][key];
+  else {
+    const stored = { v: next.v, n: next.n };
+    if (next.s) stored.s = next.s;
+    ranks[name][key] = stored;
+  }
+  saveRanks();
+}
+
 function countRank(name, value) {
   const map = getRestRanks(name);
   let n = 0;
@@ -5266,33 +5324,50 @@ function whatToOrderList(name) {
     (sec.items || []).forEach(it => {
       const rec = map[itemKey(sec.s, it.n)];
       if (!rec) return;
-      const row = { sec: sec.s, it: it, note: rec.n || '' };
+      const row = { sec: sec.s, it: it, note: rec.n || '', stars: normalizeStars(rec.s) };
       if (rec.v === 'order') order.push(row);
       else if (rec.v === 'maybe') maybe.push(row);
     });
   });
+  const byStars = (a, b) => (b.stars || 0) - (a.stars || 0);
+  order.sort(byStars);
+  maybe.sort(byStars);
   return { order, maybe };
 }
 
 function setItemRank(name, key, value) {
-  if (!ranks[name]) ranks[name] = {};
-  const cur = ranks[name][key] || { v: null, n: '' };
-  if (cur.v === value) {
-    if (cur.n) ranks[name][key] = { v: null, n: cur.n };
-    else delete ranks[name][key];
-  } else {
-    ranks[name][key] = { v: value, n: cur.n || '' };
-  }
-  if (ranks[name][key] && !ranks[name][key].v && !ranks[name][key].n) delete ranks[name][key];
-  saveRanks();
+  const cur = getItemRec(name, key);
+  putItemRec(name, key, { v: cur.v === value ? null : value, n: cur.n, s: cur.s });
 }
 
 function setItemNote(name, key, note) {
-  if (!ranks[name]) ranks[name] = {};
-  const cur = ranks[name][key] || { v: null, n: '' };
-  ranks[name][key] = { v: cur.v || null, n: note };
-  if (!ranks[name][key].v && !ranks[name][key].n) delete ranks[name][key];
-  saveRanks();
+  const cur = getItemRec(name, key);
+  putItemRec(name, key, { v: cur.v, n: note, s: cur.s });
+}
+
+function setItemStars(name, key, stars) {
+  const cur = getItemRec(name, key);
+  const next = normalizeStars(stars);
+  putItemRec(name, key, { v: cur.v, n: cur.n, s: cur.s === next ? null : next });
+}
+
+function starControlHTML(dishName, key, stars) {
+  const enc = encodeURIComponent(key);
+  const buttons = [1, 2, 3, 4, 5].map(n => {
+    const on = stars >= n;
+    const pressed = stars === n;
+    const extra = pressed ? ', selected. Tap again to clear' : '';
+    return `<button type="button" class="star-btn${on ? ' on' : ''}" data-testid="star-${n}" role="radio" aria-label="${n} star${n === 1 ? '' : 's'}${extra}" aria-checked="${pressed}" onclick="setMenuStars(decodeURIComponent('${enc}'),${n})">\u2605</button>`;
+  }).join('');
+  return `<div class="star-row" role="radiogroup" aria-label="Star rating for ${escapeHtml(dishName)}" data-testid="dish-stars">${buttons}</div>`;
+}
+
+function starReadoutHTML(stars) {
+  if (!stars) return '';
+  const icons = [1, 2, 3, 4, 5].map(n =>
+    `<span class="star-icon${stars >= n ? ' on' : ''}" aria-hidden="true">\u2605</span>`
+  ).join('');
+  return `<div class="star-readout" aria-label="${stars} star${stars === 1 ? '' : 's'}">${icons}</div>`;
 }
 
 function cardHTML(r, opts) {
@@ -5809,7 +5884,10 @@ function renderRankableMenu(name, menu) {
       const rank = rec.v || '';
       const priceStr = normalizePrice(it.p);
       const note = rec.n || '';
+      const stars = normalizeStars(rec.s);
       const noteOpen = !!menuNoteOpen[key];
+      const enc = encodeURIComponent(key);
+      const commentLabel = noteOpen ? 'Hide comment' : (note ? 'Edit comment' : 'Add comment');
       return `<div class="menu-item${rank ? ' rank-'+rank : ''}" data-testid="menu-item" data-item-key="${escapeHtml(key)}">
         <div class="menu-item-top">
           <div class="menu-item-left">
@@ -5818,14 +5896,15 @@ function renderRankableMenu(name, menu) {
           </div>
           ${priceStr ? '<div class="menu-item-price">' + escapeHtml(priceStr) + '</div>' : ''}
         </div>
+        ${starControlHTML(it.n, key, stars)}
         <div class="rank-row" role="group" aria-label="Rank ${escapeHtml(it.n)}">
-          <button type="button" class="rank-btn order${rank==='order'?' active':''}" aria-pressed="${rank==='order'}" data-testid="rank-order" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'order')">Order</button>
-          <button type="button" class="rank-btn maybe${rank==='maybe'?' active':''}" aria-pressed="${rank==='maybe'}" data-testid="rank-maybe" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'maybe')">Maybe</button>
-          <button type="button" class="rank-btn skip${rank==='skip'?' active':''}" aria-pressed="${rank==='skip'}" data-testid="rank-skip" onclick="toggleRank(decodeURIComponent('${encodeURIComponent(key)}'),'skip')">Skip</button>
+          <button type="button" class="rank-btn order${rank==='order'?' active':''}" aria-pressed="${rank==='order'}" data-testid="rank-order" onclick="toggleRank(decodeURIComponent('${enc}'),'order')">Order</button>
+          <button type="button" class="rank-btn maybe${rank==='maybe'?' active':''}" aria-pressed="${rank==='maybe'}" data-testid="rank-maybe" onclick="toggleRank(decodeURIComponent('${enc}'),'maybe')">Maybe</button>
+          <button type="button" class="rank-btn skip${rank==='skip'?' active':''}" aria-pressed="${rank==='skip'}" data-testid="rank-skip" onclick="toggleRank(decodeURIComponent('${enc}'),'skip')">Skip</button>
         </div>
-        ${rank || note ? `<button type="button" class="menu-note-toggle" onclick="toggleMenuNote(decodeURIComponent('${encodeURIComponent(key)}'))">${noteOpen ? 'Hide note' : (note ? 'Edit note' : 'Add note')}</button>` : ''}
+        <button type="button" class="menu-note-toggle" data-testid="menu-comment-toggle" onclick="toggleMenuNote(decodeURIComponent('${enc}'))">${commentLabel}</button>
         ${!noteOpen && note ? '<div class="menu-note-preview">'+escapeHtml(note)+'</div>' : ''}
-        ${noteOpen ? `<textarea class="menu-note-input" data-testid="menu-note" rows="2" placeholder="Why this ranking?" oninput="queueItemNote(decodeURIComponent('${encodeURIComponent(key)}'), this.value)" onblur="commitItemNote(decodeURIComponent('${encodeURIComponent(key)}'), this.value)">${escapeHtml(note)}</textarea>` : ''}
+        ${noteOpen ? `<textarea class="menu-note-input" data-testid="menu-comment" rows="2" placeholder="Optional — taste, portion, who should order this" oninput="queueItemNote(decodeURIComponent('${enc}'), this.value)" onblur="commitItemNote(decodeURIComponent('${enc}'), this.value)">${escapeHtml(note)}</textarea>` : ''}
       </div>`;
     }).join('');
     return `<div class="menu-section" id="msec-${si}">
@@ -5851,6 +5930,7 @@ function renderPicksView(name, picks) {
           <div class="menu-item-left">
             <div class="menu-item-name">${escapeHtml(row.it.n)}</div>
             <div class="menu-item-desc">${escapeHtml(row.sec)}${row.it.d ? ' \u00b7 ' + escapeHtml(row.it.d) : ''}</div>
+            ${starReadoutHTML(row.stars)}
             ${row.note ? '<div class="menu-note-preview">'+escapeHtml(row.note)+'</div>' : ''}
           </div>
           ${priceStr ? '<div class="menu-item-price">' + escapeHtml(priceStr) + '</div>' : ''}
@@ -5867,7 +5947,7 @@ function renderAddMenuView(rest) {
   return `<div class="menu-add-panel" data-testid="menu-add-panel">
     <p class="menu-add-lead">${hasMenu
       ? 'Replace this Greenville restaurant\u2019s menu by uploading photos or a PDF. Live extract needs an API key on deploy. Treat extracted items as UNVERIFIED until you check them against the photo.'
-      : 'No baked-in menu yet. Upload photos or a PDF to extract items (needs an API key on deploy). Rank dishes here once a menu is loaded — same Order / Maybe / Skip as Soby\u2019s, Jones, Coral, and the rest of the guide.'}</p>
+      : 'No baked-in menu yet. Upload photos or a PDF to extract items (needs an API key on deploy). Rank dishes here once a menu is loaded — same Order / Maybe / Skip, stars, and comments as Soby\u2019s, Jones, Coral, and the rest of the guide.'}</p>
     <label class="menu-file-btn">Upload photos or PDF
       <input class="menu-file-input" data-testid="menu-upload" type="file" accept="image/*,application/pdf" multiple onchange="uploadMenuFiles(this.files)">
     </label>
@@ -5875,10 +5955,26 @@ function renderAddMenuView(rest) {
   </div>`;
 }
 
+function flushOpenNotes() {
+  if (menuIdx == null) return;
+  document.querySelectorAll('.menu-note-input').forEach(el => {
+    const item = el.closest('[data-item-key]');
+    if (!item) return;
+    commitItemNote(item.getAttribute('data-item-key'), el.value);
+  });
+}
+
 function toggleRank(key, value) {
   if (menuIdx == null) return;
-  const name = R[menuIdx].name;
-  setItemRank(name, key, value);
+  flushOpenNotes();
+  setItemRank(R[menuIdx].name, key, value);
+  renderMenuModal(false);
+}
+
+function setMenuStars(key, stars) {
+  if (menuIdx == null) return;
+  flushOpenNotes();
+  setItemStars(R[menuIdx].name, key, stars);
   renderMenuModal(false);
 }
 
@@ -5887,7 +5983,10 @@ function toggleMenuNote(key) {
   renderMenuModal(false);
   if (menuNoteOpen[key]) {
     setTimeout(() => {
-      const el = document.querySelector('.menu-note-input');
+      const sel = (typeof CSS !== 'undefined' && CSS.escape)
+        ? '[data-item-key="' + CSS.escape(key) + '"] .menu-note-input'
+        : '.menu-note-input';
+      const el = document.querySelector(sel);
       if (el) el.focus();
     }, 0);
   }

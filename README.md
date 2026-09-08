@@ -21,12 +21,12 @@ Ranking lives on the restaurants already in this guide — not a beach-trip card
 1. Open the app. Greenville restaurants and staff still show. Search **Todd** or **Soby** to confirm staff search.
 2. Search **Soby**. Expand **Soby’s New South Cuisine**. Tap **Menu →**.
 3. Confirm baked-in sections (Southern Taste, Soups & Salads, Sides, Entrees, …) with jump chips.
-4. Rank **Fried Green Tomatoes** Order, **Crab Cakes** Maybe, **Seasonal Vegetable Plate** Skip. Add an optional note on the tomatoes.
-5. Open **What to order**. Fried Green Tomatoes first, then Crab Cakes. The skip stays off this list.
+4. Rank **Fried Green Tomatoes** Order, tap **5 stars**, then **Add comment** and type a short note. Rank **Crab Cakes** Maybe with **3 stars**. Rank **Seasonal Vegetable Plate** Skip.
+5. Open **What to order**. Fried Green Tomatoes first (with stars + comment), then Crab Cakes. The skip stays off this list.
 6. Close the menu. The card’s **What to order** line and the Menu button count should match.
-7. Refresh. Reopen Soby’s — rankings and notes should still be there.
+7. Refresh. Reopen Soby’s — rankings, stars, and comments should still be there.
 
-The same Order / Maybe / Skip controls are on every Greenville restaurant in the guide, including newly embedded **Cork & Cleaver** (official PDF) and **South Main Social** (official site — names only, no published prices).
+The same Order / Maybe / Skip, 1–5 stars, and optional comment controls are on every Greenville restaurant in the guide, including newly embedded **Cork & Cleaver** (official PDF) and **South Main Social** (official site — names only, no published prices). Uploaded menus use the same rank UI.
 
 Places without a stable public menu stay as they were: BrickTop’s (no good GVL priced HTML), Curean (rotating), Topsoil (prix fixe only). DeMarco’s prices were not re-verified. Live extract remains optional and **UNVERIFIED**.
 
@@ -62,7 +62,7 @@ No new deploy is required to try rankings on a local static server.
 | Key | What |
 | --- | --- |
 | `gvl.order` | Existing drag-to-reorder / top-five favorites |
-| `gvl.ranks` | Per-restaurant dish ranks (`order` / `maybe` / `skip`) and notes |
+| `gvl.ranks` | Per-restaurant dish ranks. Keyed by restaurant name, then `section\|dish name`. Each dish is `{ v, n, s }`: `v` is `order` / `maybe` / `skip`, `n` is the optional comment, `s` is a 1–5 star rating. Older saves without `s` still load. |
 | `gvl.customMenus` | Menus from a live extract (overrides the baked-in menu for that restaurant) |
 
 Clearing site data resets rankings and custom menus. Baked-in Greenville menus remain in the page.
