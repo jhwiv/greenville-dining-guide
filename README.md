@@ -26,9 +26,9 @@ Ranking lives on the restaurants already in this guide — not a beach-trip card
 6. Close the menu. The card’s **What to order** line and the Menu button count should match.
 7. Refresh. Reopen Soby’s — rankings and notes should still be there.
 
-The same Order / Maybe / Skip controls are on every Greenville restaurant that already had an in-app menu (Jones, Coral, Jianna, …).
+The same Order / Maybe / Skip controls are on every Greenville restaurant in the guide, including newly embedded **Cork & Cleaver** (official PDF) and **South Main Social** (official site — names only, no published prices).
 
-Cork & Cleaver and South Main Social still have no baked-in menu: expand the card → **Add menu →** → upload photos or a PDF. Do not invent dishes for those places. Live extract needs an API key on deploy; treat any extract as **UNVERIFIED**.
+Places without a stable public menu stay as they were: BrickTop’s (no good GVL priced HTML), Curean (rotating), Topsoil (prix fixe only). DeMarco’s prices were not re-verified. Live extract remains optional and **UNVERIFIED**.
 
 ## Optional QA fixture (not a restaurant)
 
